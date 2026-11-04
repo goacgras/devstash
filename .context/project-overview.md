@@ -21,16 +21,16 @@
 
 Developers keep their essentials scattered across many tools:
 
-| What                | Where it usually lives        |
-| ------------------- | ----------------------------- |
-| Code snippets       | VS Code, Notion               |
-| AI prompts          | Chat histories                |
-| Context files       | Buried in project folders     |
-| Useful links        | Browser bookmarks             |
-| Docs                | Random folders                |
-| Commands            | `.txt` files                  |
-| Project templates   | GitHub Gists                  |
-| Terminal commands   | Bash history                  |
+| What              | Where it usually lives    |
+| ----------------- | ------------------------- |
+| Code snippets     | VS Code, Notion           |
+| AI prompts        | Chat histories            |
+| Context files     | Buried in project folders |
+| Useful links      | Browser bookmarks         |
+| Docs              | Random folders            |
+| Commands          | `.txt` files              |
+| Project templates | GitHub Gists              |
+| Terminal commands | Bash history              |
 
 This causes **context switching, lost knowledge, and inconsistent workflows**. DevStash consolidates everything into one place.
 
@@ -53,12 +53,12 @@ flowchart LR
 
 ## Target Users
 
-| Persona                     | Needs                                                      |
-| --------------------------- | ---------------------------------------------------------- |
-| **Everyday Developer**      | Fast access to snippets, prompts, commands, and links      |
-| **AI-first Developer**      | Save prompts, contexts, workflows, and system messages     |
-| **Content Creator/Educator**| Store code blocks, explanations, and course notes          |
-| **Full-stack Builder**      | Collect patterns, boilerplates, and API examples           |
+| Persona                      | Needs                                                  |
+| ---------------------------- | ------------------------------------------------------ |
+| **Everyday Developer**       | Fast access to snippets, prompts, commands, and links  |
+| **AI-first Developer**       | Save prompts, contexts, workflows, and system messages |
+| **Content Creator/Educator** | Store code blocks, explanations, and course notes      |
+| **Full-stack Builder**       | Collect patterns, boilerplates, and API examples       |
 
 ---
 
@@ -68,17 +68,18 @@ flowchart LR
 
 Every item has a type. Users will eventually create custom types (Pro, later). The following **system types** are fixed and cannot be changed:
 
-| Type      | Kind  | Icon (lucide)  | Color                                                    | Tier     | URL                |
-| --------- | ----- | -------------- | -------------------------------------------------------- | -------- | ------------------ |
-| Snippet   | text  | `Code`         | ![#3b82f6](https://placehold.co/12x12/3b82f6/3b82f6.png) `#3b82f6` blue    | Free     | `/items/snippets`  |
-| Prompt    | text  | `Sparkles`     | ![#8b5cf6](https://placehold.co/12x12/8b5cf6/8b5cf6.png) `#8b5cf6` purple  | Free     | `/items/prompts`   |
-| Command   | text  | `Terminal`     | ![#f97316](https://placehold.co/12x12/f97316/f97316.png) `#f97316` orange  | Free     | `/items/commands`  |
-| Note      | text  | `StickyNote`   | ![#fde047](https://placehold.co/12x12/fde047/fde047.png) `#fde047` yellow  | Free     | `/items/notes`     |
-| File      | file  | `File`         | ![#6b7280](https://placehold.co/12x12/6b7280/6b7280.png) `#6b7280` gray    | **Pro**  | `/items/files`     |
-| Image     | file  | `Image`        | ![#ec4899](https://placehold.co/12x12/ec4899/ec4899.png) `#ec4899` pink    | **Pro**  | `/items/images`    |
-| Link      | url   | `Link`         | ![#10b981](https://placehold.co/12x12/10b981/10b981.png) `#10b981` emerald | Free     | `/items/links`     |
+| Type    | Kind | Icon (lucide) | Color                                                                      | Tier    | URL               |
+| ------- | ---- | ------------- | -------------------------------------------------------------------------- | ------- | ----------------- |
+| Snippet | text | `Code`        | ![#3b82f6](https://placehold.co/12x12/3b82f6/3b82f6.png) `#3b82f6` blue    | Free    | `/items/snippets` |
+| Prompt  | text | `Sparkles`    | ![#8b5cf6](https://placehold.co/12x12/8b5cf6/8b5cf6.png) `#8b5cf6` purple  | Free    | `/items/prompts`  |
+| Command | text | `Terminal`    | ![#f97316](https://placehold.co/12x12/f97316/f97316.png) `#f97316` orange  | Free    | `/items/commands` |
+| Note    | text | `StickyNote`  | ![#fde047](https://placehold.co/12x12/fde047/fde047.png) `#fde047` yellow  | Free    | `/items/notes`    |
+| File    | file | `File`        | ![#6b7280](https://placehold.co/12x12/6b7280/6b7280.png) `#6b7280` gray    | **Pro** | `/items/files`    |
+| Image   | file | `Image`       | ![#ec4899](https://placehold.co/12x12/ec4899/ec4899.png) `#ec4899` pink    | **Pro** | `/items/images`   |
+| Link    | url  | `Link`        | ![#10b981](https://placehold.co/12x12/10b981/10b981.png) `#10b981` emerald | Free    | `/items/links`    |
 
 Content kinds:
+
 - **Text**: snippet, prompt, command, note
 - **URL**: link
 - **File**: file, image
@@ -90,6 +91,7 @@ Items should be quick to access and create from a **drawer**.
 Collections hold items of **any type**. An item can belong to **multiple collections** (e.g. a React snippet in both "React Patterns" and "Interview Prep").
 
 Examples:
+
 - **React Patterns** — snippets, notes
 - **Context Files** — files
 - **Python Snippets** — snippets
@@ -97,6 +99,7 @@ Examples:
 ### C. Search
 
 Powerful search across:
+
 - Content
 - Tags
 - Titles
@@ -383,6 +386,7 @@ model Tag {
 ```
 
 > **Notes**
+>
 > - `isPro` above should be a real `Boolean @default(false)`; fix when finalizing the schema. During development, all users get Pro access regardless of this flag (see [Monetization](#monetization)).
 > - Prisma 7 requires a `prisma.config.ts` for the datasource URL and uses driver adapters (e.g. `@prisma/adapter-neon`). Check the latest docs before setup.
 > - Search will likely need a Postgres full-text index (`tsvector`) or `pg_trgm`, added via a custom migration.
@@ -391,23 +395,23 @@ model Tag {
 
 ## Tech Stack
 
-| Layer              | Choice                                                                 |
-| ------------------ | ---------------------------------------------------------------------- |
-| Framework          | **TanStack Start** (React 19, TypeScript)                              |
-| Routing            | TanStack Router (file-based, type-safe; bundled with Start)            |
-| Data fetching      | **TanStack Query**                                                     |
-| Rendering          | SSR with dynamic components                                            |
-| Backend            | TanStack Start server functions and server routes (items, uploads, AI) |
-| Database           | PostgreSQL on **Neon**                                                 |
-| ORM                | **Prisma 7** (fetch latest docs before setup)                          |
-| Caching            | Redis (maybe)                                                          |
-| File storage       | **Cloudflare R2**                                                      |
-| Authentication     | Auth.js (NextAuth v5) — email/password + GitHub OAuth *(see Open Questions)* |
-| AI                 | OpenAI `gpt-5-nano`                                                    |
-| Styling            | Tailwind CSS v4 + shadcn/ui                                            |
-| Icons              | lucide-react                                                           |
-| Payments           | Stripe                                                                 |
-| Repo               | Single codebase for less overhead                                      |
+| Layer          | Choice                                                                       |
+| -------------- | ---------------------------------------------------------------------------- |
+| Framework      | **TanStack Start** (React 19, TypeScript)                                    |
+| Routing        | TanStack Router (file-based, type-safe; bundled with Start)                  |
+| Data fetching  | **TanStack Query**                                                           |
+| Rendering      | SSR with dynamic components                                                  |
+| Backend        | TanStack Start server functions and server routes (items, uploads, AI)       |
+| Database       | PostgreSQL on **Neon**                                                       |
+| ORM            | **Prisma 7** (fetch latest docs before setup)                                |
+| Caching        | Redis (maybe)                                                                |
+| File storage   | **Cloudflare R2**                                                            |
+| Authentication | Auth.js (NextAuth v5) — email/password + GitHub OAuth _(see Open Questions)_ |
+| AI             | OpenAI `gpt-5-nano`                                                          |
+| Styling        | Tailwind CSS v4 + shadcn/ui                                                  |
+| Icons          | lucide-react                                                                 |
+| Payments       | Stripe                                                                       |
+| Repo           | Single codebase for less overhead                                            |
 
 ### Database Rules
 
@@ -462,15 +466,15 @@ flowchart TB
 
 ### Suggested Route Map
 
-| URL                       | Purpose                                      |
-| ------------------------- | -------------------------------------------- |
-| `/`                       | Dashboard: collections grid + recent items   |
-| `/items/$type`            | Items by type (`/items/snippets`, etc.)      |
-| `/collections`            | All collections                              |
-| `/collections/$id`        | Single collection                            |
-| `/search`                 | Search results                               |
-| `/settings`               | Account, billing, export                     |
-| `/sign-in`, `/sign-up`    | Authentication                               |
+| URL                    | Purpose                                    |
+| ---------------------- | ------------------------------------------ |
+| `/`                    | Dashboard: collections grid + recent items |
+| `/items/$type`         | Items by type (`/items/snippets`, etc.)    |
+| `/collections`         | All collections                            |
+| `/collections/$id`     | Single collection                          |
+| `/search`              | Search results                             |
+| `/settings`            | Account, billing, export                   |
+| `/sign-in`, `/sign-up` | Authentication                             |
 
 Individual items open in a **drawer** (can be driven by a search param, e.g. `?item=<id>`, so drawers are linkable).
 
@@ -480,17 +484,17 @@ Individual items open in a **drawer** (can be driven by a search param, e.g. `?i
 
 Freemium model.
 
-| Feature                  | Free                              | Pro ($8/month or $72/year)        |
-| ------------------------ | --------------------------------- | --------------------------------- |
-| Items                    | 50 total                          | Unlimited                         |
-| Collections              | 3                                 | Unlimited                         |
-| System types             | All except file/image             | All                               |
-| File & image uploads     | No                                | Yes                               |
-| Search                   | Basic                             | Basic                             |
-| AI features              | No                                | Auto-tagging, code explanation, prompt optimizer |
-| Export (JSON/ZIP)        | No                                | Yes                               |
-| Custom types             | No                                | Yes (coming later)                |
-| Support                  | Standard                          | Priority                          |
+| Feature              | Free                  | Pro ($8/month or $72/year)                       |
+| -------------------- | --------------------- | ------------------------------------------------ |
+| Items                | 50 total              | Unlimited                                        |
+| Collections          | 3                     | Unlimited                                        |
+| System types         | All except file/image | All                                              |
+| File & image uploads | No                    | Yes                                              |
+| Search               | Basic                 | Basic                                            |
+| AI features          | No                    | Auto-tagging, code explanation, prompt optimizer |
+| Export (JSON/ZIP)    | No                    | Yes                                              |
+| Custom types         | No                    | Yes (coming later)                               |
+| Support              | Standard              | Priority                                         |
 
 **Development note:** Build the foundation for Pro gating (`isPro`, Stripe fields, limit checks), but during development **all users can access everything**. A single feature-flag/helper (e.g. `canUse(user, feature)`) makes it easy to flip enforcement on later.
 
@@ -537,6 +541,13 @@ Freemium model.
 - Desktop-first, mobile usable
 - Sidebar becomes a drawer on mobile
 
+### Screenshots
+
+Refer to the screenshots below as the base for the dashboard UI. It does not have to be the exact. Use it as a reference:
+
+- @context/screenshots/dashboard-ui-main.png
+- @context/screenshots/dashboard-ui-drawer.png
+
 ### Micro-interactions
 
 - Smooth transitions
@@ -560,24 +571,28 @@ Freemium model.
 ## Reference Links
 
 **Framework & data**
+
 - [TanStack Start](https://tanstack.com/start/latest)
 - [TanStack Router](https://tanstack.com/router/latest)
 - [TanStack Query](https://tanstack.com/query/latest)
 - [TanStack Query + SSR](https://tanstack.com/query/latest/docs/framework/react/guides/ssr)
 
 **Database & storage**
+
 - [Neon](https://neon.tech/docs)
 - [Prisma ORM](https://www.prisma.io/docs)
 - [Prisma Migrate](https://www.prisma.io/docs/orm/prisma-migrate)
 - [Cloudflare R2](https://developers.cloudflare.com/r2/)
 
 **Auth, payments, AI**
+
 - [Auth.js](https://authjs.dev)
 - [Better Auth](https://www.better-auth.com/docs) (alternative)
 - [Stripe Billing](https://docs.stripe.com/billing)
 - [OpenAI API](https://platform.openai.com/docs)
 
 **UI**
+
 - [Tailwind CSS v4](https://tailwindcss.com/docs)
 - [shadcn/ui](https://ui.shadcn.com)
 - [lucide icons](https://lucide.dev/icons)
