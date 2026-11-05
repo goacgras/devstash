@@ -1,4 +1,5 @@
 import type { MockCollection, MockItem } from "#/lib/mock-data";
+import type { DashboardCollection } from "#/types/collections";
 
 export function getItemCountsByType(items: MockItem[]): Record<string, number> {
 	const counts: Record<string, number> = {};
@@ -16,7 +17,7 @@ export interface DashboardStats {
 }
 
 export function getDashboardStats(
-	collections: MockCollection[],
+	collections: DashboardCollection[],
 	items: MockItem[],
 ): DashboardStats {
 	return {

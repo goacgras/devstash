@@ -31,6 +31,36 @@ const TYPE_COLOR_CLASSES: Record<string, string> = {
 	link: "text-emerald-500",
 };
 
+export const TYPE_BORDER_CLASSES: Record<string, string> = {
+	snippet: "border-blue-500",
+	prompt: "border-violet-500",
+	command: "border-orange-500",
+	note: "border-yellow-300",
+	file: "border-gray-500",
+	image: "border-pink-500",
+	link: "border-emerald-500",
+};
+
+interface TypeIconProps {
+	// System type name (e.g. "snippet"), used for the color
+	name: string;
+	// Lucide icon name (e.g. "Code")
+	icon: string;
+	label?: string;
+	className?: string;
+}
+
+export function TypeIcon({ name, icon, label, className }: TypeIconProps) {
+	const Icon = ITEM_TYPE_ICONS[icon] ?? File;
+
+	return (
+		<Icon
+			aria-label={label ?? name}
+			className={cn("size-4 shrink-0", TYPE_COLOR_CLASSES[name], className)}
+		/>
+	);
+}
+
 interface ItemTypeIconProps {
 	typeId: string;
 	className?: string;
@@ -38,12 +68,13 @@ interface ItemTypeIconProps {
 
 export default function ItemTypeIcon({ typeId, className }: ItemTypeIconProps) {
 	const itemType = MOCK_ITEM_TYPES.find((type) => type.id === typeId);
-	const Icon = ITEM_TYPE_ICONS[itemType?.icon ?? ""] ?? File;
 
 	return (
-		<Icon
-			aria-label={itemType?.name}
-			className={cn("size-4 shrink-0", TYPE_COLOR_CLASSES[typeId], className)}
+		<TypeIcon
+			name={typeId}
+			icon={itemType?.icon ?? ""}
+			label={itemType?.name}
+			className={className}
 		/>
 	);
 }
