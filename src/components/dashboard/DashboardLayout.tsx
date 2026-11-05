@@ -1,4 +1,5 @@
 import { useState } from "react";
+import DashboardMain from "./DashboardMain";
 import DashboardTopBar from "./DashboardTopBar";
 import Sidebar from "./Sidebar";
 
@@ -32,9 +33,7 @@ export default function DashboardLayout() {
 			) : null}
 			<div className="flex min-w-0 flex-1 flex-col">
 				<DashboardTopBar onToggleSidebar={toggleSidebar} />
-				<main className="flex-1 p-6">
-					<h2 className="text-lg font-semibold">Main</h2>
-				</main>
+				<DashboardMain />
 			</div>
 		</div>
 	);

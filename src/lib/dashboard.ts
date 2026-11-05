@@ -8,6 +8,39 @@ export function getItemCountsByType(items: MockItem[]): Record<string, number> {
 	return counts;
 }
 
+export interface DashboardStats {
+	itemCount: number;
+	collectionCount: number;
+	favoriteItemCount: number;
+	favoriteCollectionCount: number;
+}
+
+export function getDashboardStats(
+	collections: MockCollection[],
+	items: MockItem[],
+): DashboardStats {
+	return {
+		itemCount: items.length,
+		collectionCount: collections.length,
+		favoriteItemCount: items.filter((item) => item.isFavorite).length,
+		favoriteCollectionCount: collections.filter(
+			(collection) => collection.isFavorite,
+		).length,
+	};
+}
+
+export function getPinnedItems(items: MockItem[]): MockItem[] {
+	return sortByUpdatedAt(items.filter((item) => item.isPinned));
+}
+
+export function getRecentItems(items: MockItem[], limit: number): MockItem[] {
+	return sortByUpdatedAt(items).slice(0, limit);
+}
+
+function sortByUpdatedAt(items: MockItem[]): MockItem[] {
+	return [...items].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+}
+
 export function getRecentCollections(
 	collections: MockCollection[],
 	items: MockItem[],
