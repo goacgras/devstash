@@ -17,7 +17,7 @@ Package manager is npm (`package-lock.json`). The README and `.cursorrules` ment
 
 ```bash
 npm install
-npm run dev            # Vite dev server on port 3000
+npm run dev            # Vite dev server on port 4000
 npm run build          # Production build; also regenerates src/routeTree.gen.ts
 npm run preview        # Serve the production build
 npm run lint           # biome lint
