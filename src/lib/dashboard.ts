@@ -1,5 +1,6 @@
 import type { MockCollection, MockItem } from "#/lib/mock-data";
 import type { DashboardCollection } from "#/types/collections";
+import type { DashboardItems } from "#/types/items";
 
 export function getItemCountsByType(items: MockItem[]): Record<string, number> {
 	const counts: Record<string, number> = {};
@@ -18,28 +19,16 @@ export interface DashboardStats {
 
 export function getDashboardStats(
 	collections: DashboardCollection[],
-	items: MockItem[],
+	items: Pick<DashboardItems, "itemCount" | "favoriteItemCount">,
 ): DashboardStats {
 	return {
-		itemCount: items.length,
+		itemCount: items.itemCount,
 		collectionCount: collections.length,
-		favoriteItemCount: items.filter((item) => item.isFavorite).length,
+		favoriteItemCount: items.favoriteItemCount,
 		favoriteCollectionCount: collections.filter(
 			(collection) => collection.isFavorite,
 		).length,
 	};
-}
-
-export function getPinnedItems(items: MockItem[]): MockItem[] {
-	return sortByUpdatedAt(items.filter((item) => item.isPinned));
-}
-
-export function getRecentItems(items: MockItem[], limit: number): MockItem[] {
-	return sortByUpdatedAt(items).slice(0, limit);
-}
-
-function sortByUpdatedAt(items: MockItem[]): MockItem[] {
-	return [...items].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 }
 
 export function getRecentCollections(
