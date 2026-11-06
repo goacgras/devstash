@@ -1,8 +1,28 @@
 import { prisma } from "#/db";
 import { getDemoUserId } from "#/lib/db/demo-user";
-import type { DashboardItem, DashboardItems } from "#/types/items";
+import type {
+	DashboardItem,
+	DashboardItems,
+	SidebarItemType,
+} from "#/types/items";
 
 const RECENT_ITEM_LIMIT = 10;
+
+// Display order for the sidebar; unknown type names sort last.
+const SYSTEM_TYPE_ORDER = [
+	"snippet",
+	"prompt",
+	"command",
+	"note",
+	"file",
+	"image",
+	"link",
+];
+
+function typeRank(name: string): number {
+	const index = SYSTEM_TYPE_ORDER.indexOf(name);
+	return index === -1 ? SYSTEM_TYPE_ORDER.length : index;
+}
 
 const ITEM_SELECT = {
 	id: true,
@@ -73,4 +93,34 @@ export async function getDashboardItems(): Promise<DashboardItems> {
 		itemCount,
 		favoriteItemCount,
 	};
+}
+
+export async function getSidebarItemTypes(): Promise<SidebarItemType[]> {
+	const userId = await getDemoUserId();
+
+	const [systemTypes, counts] = await Promise.all([
+		prisma.itemType.findMany({
+			where: { isSystem: true },
+			select: { id: true, name: true, icon: true },
+		}),
+		userId
+			? prisma.item.groupBy({
+					by: ["itemTypeId"],
+					where: { userId },
+					_count: { _all: true },
+				})
+			: Promise.resolve([]),
+	]);
+
+	const countByTypeId = new Map(
+		counts.map((row) => [row.itemTypeId, row._count._all]),
+	);
+
+	return systemTypes
+		.map((type) => ({
+			name: type.name,
+			icon: type.icon,
+			count: countByTypeId.get(type.id) ?? 0,
+		}))
+		.sort((a, b) => typeRank(a.name) - typeRank(b.name));
 }

@@ -8,7 +8,6 @@ import {
 	StickyNote,
 	Terminal,
 } from "lucide-react";
-import { MOCK_ITEM_TYPES } from "#/lib/mock-data";
 import { cn } from "#/lib/utils";
 
 const ITEM_TYPE_ICONS: Record<string, LucideIcon> = {
@@ -41,6 +40,16 @@ export const TYPE_BORDER_CLASSES: Record<string, string> = {
 	link: "border-emerald-500",
 };
 
+export const TYPE_DOT_CLASSES: Record<string, string> = {
+	snippet: "bg-blue-500",
+	prompt: "bg-violet-500",
+	command: "bg-orange-500",
+	note: "bg-yellow-300",
+	file: "bg-gray-500",
+	image: "bg-pink-500",
+	link: "bg-emerald-500",
+};
+
 interface TypeIconProps {
 	// System type name (e.g. "snippet"), used for the color
 	name: string;
@@ -57,24 +66,6 @@ export function TypeIcon({ name, icon, label, className }: TypeIconProps) {
 		<Icon
 			aria-label={label ?? name}
 			className={cn("size-4 shrink-0", TYPE_COLOR_CLASSES[name], className)}
-		/>
-	);
-}
-
-interface ItemTypeIconProps {
-	typeId: string;
-	className?: string;
-}
-
-export default function ItemTypeIcon({ typeId, className }: ItemTypeIconProps) {
-	const itemType = MOCK_ITEM_TYPES.find((type) => type.id === typeId);
-
-	return (
-		<TypeIcon
-			name={typeId}
-			icon={itemType?.icon ?? ""}
-			label={itemType?.name}
-			className={className}
 		/>
 	);
 }

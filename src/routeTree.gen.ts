@@ -10,12 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CollectionsRouteImport } from './routes/collections'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ItemsTypeRouteImport } from './routes/items/$type'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CollectionsRoute = CollectionsRouteImport.update({
+  id: '/collections',
+  path: '/collections',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -31,30 +37,34 @@ const ItemsTypeRoute = ItemsTypeRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/collections': typeof CollectionsRoute
   '/dashboard': typeof DashboardRoute
   '/items/$type': typeof ItemsTypeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/collections': typeof CollectionsRoute
   '/dashboard': typeof DashboardRoute
   '/items/$type': typeof ItemsTypeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/collections': typeof CollectionsRoute
   '/dashboard': typeof DashboardRoute
   '/items/$type': typeof ItemsTypeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/items/$type'
+  fullPaths: '/' | '/collections' | '/dashboard' | '/items/$type'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/items/$type'
-  id: '__root__' | '/' | '/dashboard' | '/items/$type'
+  to: '/' | '/collections' | '/dashboard' | '/items/$type'
+  id: '__root__' | '/' | '/collections' | '/dashboard' | '/items/$type'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CollectionsRoute: typeof CollectionsRoute
   DashboardRoute: typeof DashboardRoute
   ItemsTypeRoute: typeof ItemsTypeRoute
 }
@@ -66,6 +76,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/collections': {
+      id: '/collections'
+      path: '/collections'
+      fullPath: '/collections'
+      preLoaderRoute: typeof CollectionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -87,6 +104,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CollectionsRoute: CollectionsRoute,
   DashboardRoute: DashboardRoute,
   ItemsTypeRoute: ItemsTypeRoute,
 }
