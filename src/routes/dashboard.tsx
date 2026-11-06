@@ -1,10 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import DashboardLayout from "#/components/dashboard/DashboardLayout";
 import { collectionsQueryOptions } from "#/queries/collections";
+import { itemsQueryOptions } from "#/queries/items";
 
 export const Route = createFileRoute("/dashboard")({
-	loader: ({ context }) =>
-		context.queryClient.ensureQueryData(collectionsQueryOptions),
+	loader: async ({ context }) => {
+		await Promise.all([
+			context.queryClient.query(collectionsQueryOptions),
+			context.queryClient.query(itemsQueryOptions),
+		]);
+	},
 	component: Dashboard,
 	errorComponent: DashboardError,
 });

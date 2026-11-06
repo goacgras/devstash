@@ -1,10 +1,11 @@
 import { Pin } from "lucide-react";
-import type { MockItem } from "#/lib/mock-data";
-import ItemTypeIcon from "./ItemTypeIcon";
+import { cn } from "#/lib/utils";
+import type { DashboardItem } from "#/types/items";
+import { TYPE_BORDER_CLASSES, TypeIcon } from "./ItemTypeIcon";
 
 interface ItemListProps {
 	title: string;
-	items: MockItem[];
+	items: DashboardItem[];
 	showPinIcon?: boolean;
 }
 
@@ -34,16 +35,21 @@ export default function ItemList({
 					{items.map((item) => (
 						<li
 							key={item.id}
-							className="flex items-start gap-4 rounded-xl border border-border bg-card p-4"
+							className={cn(
+								"flex items-start gap-4 rounded-xl border bg-card p-4",
+								TYPE_BORDER_CLASSES[item.typeName] ?? "border-border",
+							)}
 						>
 							<div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted">
-								<ItemTypeIcon typeId={item.typeId} />
+								<TypeIcon name={item.typeName} icon={item.typeIcon} />
 							</div>
 							<div className="flex min-w-0 flex-1 flex-col gap-1">
 								<h3 className="truncate font-medium">{item.title}</h3>
-								<p className="truncate text-sm text-muted-foreground">
-									{item.description}
-								</p>
+								{item.description ? (
+									<p className="truncate text-sm text-muted-foreground">
+										{item.description}
+									</p>
+								) : null}
 								{item.tags.length > 0 ? (
 									<div className="mt-1 flex flex-wrap gap-2">
 										{item.tags.map((tag) => (

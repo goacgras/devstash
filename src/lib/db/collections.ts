@@ -1,11 +1,9 @@
 import { prisma } from "#/db";
+import { getDemoUserId } from "#/lib/db/demo-user";
 import type {
 	CollectionTypeSummary,
 	DashboardCollection,
 } from "#/types/collections";
-
-// Auth is not wired up yet, so the dashboard shows the seeded demo user's data.
-const DEMO_USER_EMAIL = "demo@devstash.io";
 
 interface CollectionItemLink {
 	item: { itemType: { name: string; icon: string } };
@@ -33,16 +31,13 @@ export function summarizeTypes(
 export async function getDashboardCollections(): Promise<
 	DashboardCollection[]
 > {
-	const user = await prisma.user.findUnique({
-		where: { email: DEMO_USER_EMAIL },
-		select: { id: true },
-	});
-	if (!user) {
+	const userId = await getDemoUserId();
+	if (!userId) {
 		return [];
 	}
 
 	const collections = await prisma.collection.findMany({
-		where: { userId: user.id },
+		where: { userId },
 		orderBy: { updatedAt: "desc" },
 		select: {
 			id: true,
