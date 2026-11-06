@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getDashboardItems } from "#/lib/db/items";
-import type { ItemsResult } from "#/types/items";
+import { getDashboardItems, getSidebarItemTypes } from "#/lib/db/items";
+import type { ItemsResult, ItemTypesResult } from "#/types/items";
 
 export const getItems = createServerFn({ method: "GET" }).handler(
 	async (): Promise<ItemsResult> => {
@@ -10,6 +10,18 @@ export const getItems = createServerFn({ method: "GET" }).handler(
 		} catch (error) {
 			console.error("Failed to load items", error);
 			return { success: false, error: "Failed to load items" };
+		}
+	},
+);
+
+export const getItemTypes = createServerFn({ method: "GET" }).handler(
+	async (): Promise<ItemTypesResult> => {
+		try {
+			const data = await getSidebarItemTypes();
+			return { success: true, data };
+		} catch (error) {
+			console.error("Failed to load item types", error);
+			return { success: false, error: "Failed to load item types" };
 		}
 	},
 );
