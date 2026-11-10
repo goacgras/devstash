@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { Badge } from "#/components/ui/badge";
 import type { SidebarItemType } from "#/types/items";
 import { TypeIcon } from "./ItemTypeIcon";
 
@@ -11,6 +12,9 @@ interface SidebarTypesProps {
 function toPluralLabel(name: string): string {
 	return `${name.charAt(0).toUpperCase()}${name.slice(1)}s`;
 }
+
+// Types that show a PRO badge in the sidebar.
+const PRO_TYPES = new Set(["file", "image"]);
 
 export default function SidebarTypes({ types, onNavigate }: SidebarTypesProps) {
 	return (
@@ -29,6 +33,14 @@ export default function SidebarTypes({ types, onNavigate }: SidebarTypesProps) {
 							<span className="flex-1 truncate">
 								{toPluralLabel(type.name)}
 							</span>
+							{PRO_TYPES.has(type.name) && (
+								<Badge
+									variant="outline"
+									className="px-1.5 py-0 text-[10px] font-medium tracking-wide text-muted-foreground"
+								>
+									PRO
+								</Badge>
+							)}
 							<span className="text-xs text-muted-foreground">
 								{type.count}
 							</span>
