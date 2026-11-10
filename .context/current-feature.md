@@ -1,20 +1,16 @@
-# Current Feature: Add Pro Badge to Sidebar
+# Current Feature
 
 ## Status
 
-In Progress
+Completed
 
 ## Goals
 
-- Add a pro badge to the files and images types in the sidebar
-- Use the ShadCN UI badge component
-- Make the badge clean, subtle and sleek
-- Make "PRO" all uppercase
+<!-- Goals and requirements -->
 
 ## Notes
 
-- Source spec: `.context/features/add-pro-badge-sidebar.md`
-- Overview: add a pro badge to the files and the images type in the sidebar.
+<!-- Any extra notes -->
 
 ## History
 
@@ -30,3 +26,4 @@ In Progress
 - Completed Dashboard Items on branch `feature/dashboard-items` (not yet committed or merged): the dashboard's pinned and recent items and the item stats come from Neon via Prisma. Queries live in `src/lib/db/items.ts` (demo-user lookup shared via `src/lib/db/demo-user.ts`), exposed through the `getItems` server function in `src/server/items.functions.ts`, with `['items']` query options in `src/queries/items.ts`. The `/dashboard` loader prefetches items and collections; `DashboardItems` uses `useSuspenseQuery` behind an `ItemsSkeleton`. Item cards take icon and border color from the item type, and the Pinned section is hidden when empty. Build passes; not checked in a browser or SSR-verified against the dev database. The sidebar was still on mock data at this point; Stats & Sidebar replaced that.
 - Completed Stats & Sidebar on branch `feature/stats-sidebar` (not yet committed or merged): the sidebar's item types and their counts come from Neon via Prisma (`getSidebarItemTypes` in `src/lib/db/items.ts`, exposed through `getItemTypes` in `src/server/items.functions.ts`, with `['item-types']` query options in `src/queries/items.ts`, prefetched by the `/dashboard` loader). The sidebar's favorite and recent collections come from the existing collections query. Recent collections show a circle in the most-used type's color. A "View all collections" link points to a placeholder `/collections` route. `src/lib/mock-data.ts` now holds only the mock user, used by the sidebar user area. Dashboard stats were already database-backed. Type check is clean apart from a pre-existing `/about` link in `Header.tsx`; build passes; not checked in a browser or SSR-verified against the dev database.
 - Completed Items and Collections design update with hover animation on branch `feature/hover-animation` (not yet committed or merged): dashboard item and recent collection cards show a 4px colored left border from the item type (collections use their most-used type) instead of a full-border color. A new `HoverCard` component (`src/components/dashboard/HoverCard.tsx`) wraps them in a Motion `motion.li` that lifts 3px with a soft shadow on hover, using a spring transition. Uses the `motion` package (`motion/react`) instead of `framer-motion`. Build passes; not checked in a browser.
+- Completed Add Pro Badge to Sidebar on branch `feature/add-pro-badge-sidebar` (merged to `main`): the dashboard sidebar shows a subtle uppercase `PRO` badge, built with the new ShadCN `Badge` component (`src/components/ui/badge.tsx`), next to the Files and Images types. Build passes; checked in the browser.
