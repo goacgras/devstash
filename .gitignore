@@ -14,3 +14,7 @@ todos.json
 
 # Prisma generated client
 /src/generated
+
+# Environment files
+.env*
+.vercel
