@@ -1,7 +1,7 @@
 import { Star } from "lucide-react";
-import { cn } from "#/lib/utils";
 import type { DashboardCollection } from "#/types/collections";
-import { TYPE_BORDER_CLASSES, TypeIcon } from "./ItemTypeIcon";
+import HoverCard from "./HoverCard";
+import { TYPE_ACCENT_CLASSES, TypeIcon } from "./ItemTypeIcon";
 
 interface RecentCollectionsProps {
 	collections: DashboardCollection[];
@@ -17,14 +17,14 @@ export default function RecentCollections({
 				{collections.map((collection) => {
 					const mostUsedType = collection.types[0];
 					return (
-						<li
+						<HoverCard
 							key={collection.id}
-							className={cn(
-								"flex flex-col gap-3 rounded-xl border bg-card p-4",
+							accentClassName={
 								mostUsedType
-									? TYPE_BORDER_CLASSES[mostUsedType.name]
-									: "border-border",
-							)}
+									? TYPE_ACCENT_CLASSES[mostUsedType.name]
+									: undefined
+							}
+							className="flex-col gap-3"
 						>
 							<div className="flex items-center gap-2">
 								<h3 className="font-medium">{collection.name}</h3>
@@ -47,7 +47,7 @@ export default function RecentCollections({
 									<TypeIcon key={type.name} name={type.name} icon={type.icon} />
 								))}
 							</div>
-						</li>
+						</HoverCard>
 					);
 				})}
 			</ul>
