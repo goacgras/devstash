@@ -1,7 +1,7 @@
 import { Pin } from "lucide-react";
-import { cn } from "#/lib/utils";
 import type { DashboardItem } from "#/types/items";
-import { TYPE_BORDER_CLASSES, TypeIcon } from "./ItemTypeIcon";
+import HoverCard from "./HoverCard";
+import { TYPE_ACCENT_CLASSES, TypeIcon } from "./ItemTypeIcon";
 
 interface ItemListProps {
 	title: string;
@@ -33,12 +33,10 @@ export default function ItemList({
 			) : (
 				<ul className="flex flex-col gap-3">
 					{items.map((item) => (
-						<li
+						<HoverCard
 							key={item.id}
-							className={cn(
-								"flex items-start gap-4 rounded-xl border bg-card p-4",
-								TYPE_BORDER_CLASSES[item.typeName] ?? "border-border",
-							)}
+							accentClassName={TYPE_ACCENT_CLASSES[item.typeName]}
+							className="items-start gap-4"
 						>
 							<div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted">
 								<TypeIcon name={item.typeName} icon={item.typeIcon} />
@@ -69,7 +67,7 @@ export default function ItemList({
 							>
 								{DATE_FORMATTER.format(new Date(item.updatedAt))}
 							</time>
-						</li>
+						</HoverCard>
 					))}
 				</ul>
 			)}

@@ -30,14 +30,14 @@ const TYPE_COLOR_CLASSES: Record<string, string> = {
 	link: "text-emerald-500",
 };
 
-export const TYPE_BORDER_CLASSES: Record<string, string> = {
-	snippet: "border-blue-500",
-	prompt: "border-violet-500",
-	command: "border-orange-500",
-	note: "border-yellow-300",
-	file: "border-gray-500",
-	image: "border-pink-500",
-	link: "border-emerald-500",
+export const TYPE_ACCENT_CLASSES: Record<string, string> = {
+	snippet: "border-l-blue-500",
+	prompt: "border-l-violet-500",
+	command: "border-l-orange-500",
+	note: "border-l-yellow-300",
+	file: "border-l-gray-500",
+	image: "border-l-pink-500",
+	link: "border-l-emerald-500",
 };
 
 export const TYPE_DOT_CLASSES: Record<string, string> = {
