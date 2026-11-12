@@ -219,7 +219,7 @@ model User {
   password      String? // hashed; only for email/password users
 
   // Billing
-  isPro                String  @default("false") // see note below
+  isPro                Boolean @default(false)
   stripeCustomerId     String? @unique
   stripeSubscriptionId String? @unique
 
@@ -387,8 +387,8 @@ model Tag {
 
 > **Notes**
 >
-> - `isPro` above should be a real `Boolean @default(false)`; fix when finalizing the schema. During development, all users get Pro access regardless of this flag (see [Monetization](#monetization)).
-> - Prisma 7 requires a `prisma.config.ts` for the datasource URL and uses driver adapters (e.g. `@prisma/adapter-neon`). Check the latest docs before setup.
+> - During development, all users get Pro access regardless of the `isPro` flag (see [Monetization](#monetization)).
+> - Prisma 7 requires a `prisma.config.ts` for the datasource URL and uses driver adapters (e.g. `@prisma/adapter-pg`). Check the latest docs before setup.
 > - Search will likely need a Postgres full-text index (`tsvector`) or `pg_trgm`, added via a custom migration.
 
 ---

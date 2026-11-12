@@ -22,4 +22,4 @@ If there are no pinned items, nothing should display there.
 ## References
 
 Check the `@context/screenshots/dashboard-ui-main.png` screenshot if needed, but layout and design is already there.
-Check the `@context/features/.context/features/dashboard-collections-spec.md` if needed on how the collections are being fetch
+Check the `@context/features/dashboard-collections-spec.md` if needed on how the collections are being fetch
