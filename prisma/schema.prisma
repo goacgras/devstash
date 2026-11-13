@@ -137,6 +137,7 @@ model Item {
   @@index([userId, itemTypeId])
   @@index([userId, isPinned])
   @@index([userId, lastUsedAt])
+  @@index([userId, updatedAt])
 }
 
 model Collection {
@@ -158,6 +159,7 @@ model Collection {
   updatedAt DateTime @updatedAt
 
   @@index([userId])
+  @@index([userId, updatedAt])
 }
 
 // Join table: many-to-many between Item and Collection

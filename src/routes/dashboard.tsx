@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import DashboardError from "#/components/dashboard/DashboardError";
 import DashboardLayout from "#/components/dashboard/DashboardLayout";
 import { collectionsQueryOptions } from "#/queries/collections";
 import { itemsQueryOptions, itemTypesQueryOptions } from "#/queries/items";
@@ -17,14 +18,4 @@ export const Route = createFileRoute("/dashboard")({
 
 function Dashboard() {
 	return <DashboardLayout />;
-}
-
-function DashboardError() {
-	return (
-		<main className="p-6">
-			<p className="text-sm text-muted-foreground">
-				Something went wrong loading your dashboard. Please refresh the page.
-			</p>
-		</main>
-	);
 }

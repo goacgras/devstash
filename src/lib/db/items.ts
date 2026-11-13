@@ -1,4 +1,5 @@
 import { prisma } from "#/db";
+import type { Prisma } from "#/generated/prisma/client";
 import { getDemoUserId } from "#/lib/db/demo-user";
 import type {
 	DashboardItem,
@@ -35,16 +36,7 @@ const ITEM_SELECT = {
 	tags: { select: { name: true }, orderBy: { name: "asc" } },
 } as const;
 
-interface ItemRow {
-	id: string;
-	title: string;
-	description: string | null;
-	isFavorite: boolean;
-	isPinned: boolean;
-	updatedAt: Date;
-	itemType: { name: string; icon: string };
-	tags: { name: string }[];
-}
+type ItemRow = Prisma.ItemGetPayload<{ select: typeof ITEM_SELECT }>;
 
 function toDashboardItem(item: ItemRow): DashboardItem {
 	return {

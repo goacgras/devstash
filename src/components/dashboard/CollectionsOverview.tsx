@@ -5,13 +5,13 @@ import { itemsQueryOptions } from "#/queries/items";
 import RecentCollections from "./RecentCollections";
 import StatsCards from "./StatsCards";
 
-const RECENT_COLLECTION_LIMIT = 6;
+const OVERVIEW_RECENT_LIMIT = 6;
 
 export default function CollectionsOverview() {
 	const { data: collections } = useSuspenseQuery(collectionsQueryOptions);
 	const { data: items } = useSuspenseQuery(itemsQueryOptions);
 	const stats = getDashboardStats(collections, items);
-	const recentCollections = collections.slice(0, RECENT_COLLECTION_LIMIT);
+	const recentCollections = collections.slice(0, OVERVIEW_RECENT_LIMIT);
 
 	return (
 		<>
