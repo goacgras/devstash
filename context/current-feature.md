@@ -2,36 +2,15 @@
 
 ## Status
 
-In Progress
-
 <!-- Not Started | In Progress | Completed -->
 
 ## Goals
 
-Clean up low-risk findings from the code-scanner report. Each change should be behavior-neutral or a formatting/config fix. No schema changes, no query logic changes, no file deletions.
-
-- Fix the `/about` link in `src/components/Header.tsx` so `npx tsc --noEmit` is clean.
-- Run `npm run format` on the files with mismatched quote and indent style (`src/db.ts`, `src/database-url.ts`, `src/components/ThemeToggle.tsx`, `src/components/Header.tsx`, `scripts/test-db.ts`).
-- Update the Biome config: run `npx biome migrate` to fix the schema version mismatch, and exclude `src/generated` so the prisma-generated file stops triggering lint warnings.
-- Rename the duplicate `RECENT_COLLECTION_LIMIT` constants to distinct names (`SIDEBAR_RECENT_LIMIT`, `OVERVIEW_RECENT_LIMIT`), keeping their current values.
-- Extract the repeated `queryFn` unwrap logic in `src/queries/collections.ts` and `src/queries/items.ts` into a shared helper in `src/lib/`.
-- Move `DashboardError` out of `src/routes/dashboard.tsx` into `src/components/dashboard/DashboardError.tsx`.
-- Split `SidebarNavContent` and `SidebarNavSkeleton` out of `src/components/dashboard/Sidebar.tsx` into their own files, matching the existing `CollectionsSkeleton.tsx` and `ItemsSkeleton.tsx` pattern.
-- Derive the `ItemRow` type in `src/lib/db/items.ts` from `Prisma.ItemGetPayload<{ select: typeof ITEM_SELECT }>` instead of hand-writing it.
-- Add `@@index([userId, updatedAt])` to `Item` and `Collection` in `prisma/schema.prisma`. The dashboard queries filter by `userId` and sort by `updatedAt`. The change must go through `npm run db:migrate` (`prisma migrate dev`) so the migration is committed and can be applied to prod with `prisma migrate deploy`. Do not use `db push`.
+<!-- Goals and requirements -->
 
 ## Notes
 
-Excluded from this feature, with reasons:
-
-- **Move server-only code to `*.server.ts`**: touches many imports and runtime wiring, so it needs its own feature.
-- **Grouped count in `src/lib/db/collections.ts`**: changes query logic. Separate feature.
-- **Cap the pinned items query with `take`**: low risk, but it changes what users see, so it needs a decision on the limit first.
-- **Delete `Header.tsx`, `Footer.tsx`, `ThemeToggle.tsx`**: dead code, but `ai-interactions.md` requires confirmation before deleting files.
-- **Formatting of `Footer.tsx`, `router.tsx`, `integrations/tanstack-query/*`, `lib/utils.ts`**: still in the old quote and indent style. Not in the goal list, so left for a separate change. `npx biome check src` still reports these.
-
-Implementation status: the index migration is `prisma/migrations/20261113055234_add_updated_at_indexes` (applied to the Neon dev branch via `prisma migrate dev`; `prisma migrate status` reports up to date). Prod still needs `prisma migrate deploy` before the app ships. `npx tsc --noEmit` and `npm run build` pass. Not yet checked in a browser or committed.
-- **Add `notFoundComponent` and Zod validation for `/items/$type`**: new behavior, and the route is still a placeholder.
+<!-- Any extra notes -->
 
 ## History
 
@@ -48,3 +27,4 @@ Implementation status: the index migration is `prisma/migrations/20261113055234_
 - Completed Stats & Sidebar on branch `feature/stats-sidebar` (not yet committed or merged): the sidebar's item types and their counts come from Neon via Prisma (`getSidebarItemTypes` in `src/lib/db/items.ts`, exposed through `getItemTypes` in `src/server/items.functions.ts`, with `['item-types']` query options in `src/queries/items.ts`, prefetched by the `/dashboard` loader). The sidebar's favorite and recent collections come from the existing collections query. Recent collections show a circle in the most-used type's color. A "View all collections" link points to a placeholder `/collections` route. `src/lib/mock-data.ts` now holds only the mock user, used by the sidebar user area. Dashboard stats were already database-backed. Type check is clean apart from a pre-existing `/about` link in `Header.tsx`; build passes; not checked in a browser or SSR-verified against the dev database.
 - Completed Items and Collections design update with hover animation on branch `feature/hover-animation` (not yet committed or merged): dashboard item and recent collection cards show a 4px colored left border from the item type (collections use their most-used type) instead of a full-border color. A new `HoverCard` component (`src/components/dashboard/HoverCard.tsx`) wraps them in a Motion `motion.li` that lifts 3px with a soft shadow on hover, using a spring transition. Uses the `motion` package (`motion/react`) instead of `framer-motion`. Build passes; not checked in a browser.
 - Completed Add Pro Badge to Sidebar on branch `feature/add-pro-badge-sidebar` (merged to `main`): the dashboard sidebar shows a subtle uppercase `PRO` badge, built with the new ShadCN `Badge` component (`src/components/ui/badge.tsx`), next to the Files and Images types. Build passes; checked in the browser.
+- Completed Code Scanner Quick Wins on branch `feature/code-scanner-quick-wins` (merged to `main`): fixed the `/about` link so `tsc` is clean, formatted mismatched files, and updated the Biome config (schema version, `src/generated` excluded). Renamed the duplicate recent-collection limit constants, added a shared `unwrapResult` helper for query functions, moved `DashboardError` to its own file, and split `SidebarNav` and `SidebarNavSkeleton` out of `Sidebar.tsx`. Derived `ItemRow` from `Prisma.ItemGetPayload`. Added `@@index([userId, updatedAt])` to `Item` and `Collection` via migration `20261113055234_add_updated_at_indexes`, applied to the dev database; prod still needs `prisma migrate deploy`. Build passes; not checked in a browser. Deferred: server-only file moves, grouped type count, pinned item cap, dead header/footer removal, and formatting of the remaining files.
