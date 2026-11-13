@@ -2,15 +2,36 @@
 
 ## Status
 
+In Progress
+
 <!-- Not Started | In Progress | Completed -->
 
 ## Goals
 
-<!-- Goals and requirements -->
+Clean up low-risk findings from the code-scanner report. Each change should be behavior-neutral or a formatting/config fix. No schema changes, no query logic changes, no file deletions.
+
+- Fix the `/about` link in `src/components/Header.tsx` so `npx tsc --noEmit` is clean.
+- Run `npm run format` on the files with mismatched quote and indent style (`src/db.ts`, `src/database-url.ts`, `src/components/ThemeToggle.tsx`, `src/components/Header.tsx`, `scripts/test-db.ts`).
+- Update the Biome config: run `npx biome migrate` to fix the schema version mismatch, and exclude `src/generated` so the prisma-generated file stops triggering lint warnings.
+- Rename the duplicate `RECENT_COLLECTION_LIMIT` constants to distinct names (`SIDEBAR_RECENT_LIMIT`, `OVERVIEW_RECENT_LIMIT`), keeping their current values.
+- Extract the repeated `queryFn` unwrap logic in `src/queries/collections.ts` and `src/queries/items.ts` into a shared helper in `src/lib/`.
+- Move `DashboardError` out of `src/routes/dashboard.tsx` into `src/components/dashboard/DashboardError.tsx`.
+- Split `SidebarNavContent` and `SidebarNavSkeleton` out of `src/components/dashboard/Sidebar.tsx` into their own files, matching the existing `CollectionsSkeleton.tsx` and `ItemsSkeleton.tsx` pattern.
+- Derive the `ItemRow` type in `src/lib/db/items.ts` from `Prisma.ItemGetPayload<{ select: typeof ITEM_SELECT }>` instead of hand-writing it.
+- Add `@@index([userId, updatedAt])` to `Item` and `Collection` in `prisma/schema.prisma`. The dashboard queries filter by `userId` and sort by `updatedAt`. The change must go through `npm run db:migrate` (`prisma migrate dev`) so the migration is committed and can be applied to prod with `prisma migrate deploy`. Do not use `db push`.
 
 ## Notes
 
-<!-- Any extra notes -->
+Excluded from this feature, with reasons:
+
+- **Move server-only code to `*.server.ts`**: touches many imports and runtime wiring, so it needs its own feature.
+- **Grouped count in `src/lib/db/collections.ts`**: changes query logic. Separate feature.
+- **Cap the pinned items query with `take`**: low risk, but it changes what users see, so it needs a decision on the limit first.
+- **Delete `Header.tsx`, `Footer.tsx`, `ThemeToggle.tsx`**: dead code, but `ai-interactions.md` requires confirmation before deleting files.
+- **Formatting of `Footer.tsx`, `router.tsx`, `integrations/tanstack-query/*`, `lib/utils.ts`**: still in the old quote and indent style. Not in the goal list, so left for a separate change. `npx biome check src` still reports these.
+
+Implementation status: the index migration is `prisma/migrations/20261113055234_add_updated_at_indexes` (applied to the Neon dev branch via `prisma migrate dev`; `prisma migrate status` reports up to date). Prod still needs `prisma migrate deploy` before the app ships. `npx tsc --noEmit` and `npm run build` pass. Not yet checked in a browser or committed.
+- **Add `notFoundComponent` and Zod validation for `/items/$type`**: new behavior, and the route is still a placeholder.
 
 ## History
 
