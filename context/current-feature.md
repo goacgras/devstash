@@ -1,16 +1,32 @@
-# Current Feature
+# Current Feature: Auth Phase 1 (Auth.js + GitHub)
 
 ## Status
 
-<!-- Not Started | In Progress | Completed -->
+In Progress
 
 ## Goals
 
-<!-- Goals and requirements -->
+- Install `@auth/core` and `@auth/prisma-adapter` (not `next-auth`)
+- Add the GitHub OAuth provider
+- Mount the Auth.js handler as a TanStack server route under `/api/auth/*` (`src/routes/api/auth/$.ts`)
+- Provide a `getCurrentUser` server function that returns the session user or `null`
+- Protect `/dashboard` with a `beforeLoad` guard that redirects unauthenticated users to `/api/auth/signin`
+- Augment the Auth.js session/user types with `id` (`src/types/auth.d.ts`)
+- Test: `/dashboard` redirects to sign-in, GitHub sign-in returns to `/dashboard`
 
 ## Notes
 
-<!-- Any extra notes -->
+- Spec: `context/features/auth-phase-1-spec.md`
+- Files: `src/server/auth.server.ts` (config, Prisma adapter, JWT strategy), `src/server/auth.functions.ts`, `src/routes/dashboard.tsx` guard
+- Use `session: { strategy: 'jwt' }` with the Prisma adapter; use Auth.js's built-in sign-in page (no custom `pages.signIn`)
+- No `proxy.ts` or split config: this is TanStack Start, not Next.js
+- `beforeLoad` is UX only; server functions touching private data must check the user themselves
+- Env vars: `AUTH_SECRET`, `AUTH_GITHUB_ID`, `AUTH_GITHUB_SECRET` (server-only, no `VITE_` prefix)
+- GitHub OAuth callback for dev: `http://localhost:4000/api/auth/callback/github`
+- Implemented on branch `feature/auth-phase-1`: `src/server/auth.server.ts` (config with `basePath: '/api/auth'`, JWT, `session.user.id` callback), `src/routes/api/auth/$.ts`, `src/server/auth.functions.ts` (`getCurrentUser` calls `Auth` on `/api/auth/session`), `src/types/auth.d.ts`, `src/types/auth.ts`, and the `/dashboard` `beforeLoad` guard with `Cache-Control: private, no-store`
+- Verified: `tsc --noEmit` clean, `npm run build` passes. Dev server: `/dashboard` redirects to `/api/auth/signin?callbackUrl=%2Fdashboard`, `/api/auth/providers` lists GitHub with the expected callback URL, `/api/auth/session` returns `null` when signed out
+- Not yet verified: full GitHub sign-in in a browser (returns to `/dashboard`) and `getCurrentUser` with a real session
+- Other server functions still use the demo user; data routes are not yet gated by `getCurrentUser`
 
 ## History
 
