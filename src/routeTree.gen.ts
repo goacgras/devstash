@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as CollectionsRouteImport } from './routes/collections'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ItemsTypeRouteImport } from './routes/items/$type'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -34,18 +35,25 @@ const ItemsTypeRoute = ItemsTypeRouteImport.update({
   path: '/items/$type',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/collections': typeof CollectionsRoute
   '/dashboard': typeof DashboardRoute
   '/items/$type': typeof ItemsTypeRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/collections': typeof CollectionsRoute
   '/dashboard': typeof DashboardRoute
   '/items/$type': typeof ItemsTypeRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,13 +61,21 @@ export interface FileRoutesById {
   '/collections': typeof CollectionsRoute
   '/dashboard': typeof DashboardRoute
   '/items/$type': typeof ItemsTypeRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/collections' | '/dashboard' | '/items/$type'
+  fullPaths:
+    '/' | '/collections' | '/dashboard' | '/items/$type' | '/api/auth/$'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/collections' | '/dashboard' | '/items/$type'
-  id: '__root__' | '/' | '/collections' | '/dashboard' | '/items/$type'
+  to: '/' | '/collections' | '/dashboard' | '/items/$type' | '/api/auth/$'
+  id:
+    | '__root__'
+    | '/'
+    | '/collections'
+    | '/dashboard'
+    | '/items/$type'
+    | '/api/auth/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -67,6 +83,7 @@ export interface RootRouteChildren {
   CollectionsRoute: typeof CollectionsRoute
   DashboardRoute: typeof DashboardRoute
   ItemsTypeRoute: typeof ItemsTypeRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -99,6 +116,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ItemsTypeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -107,6 +131,7 @@ const rootRouteChildren: RootRouteChildren = {
   CollectionsRoute: CollectionsRoute,
   DashboardRoute: DashboardRoute,
   ItemsTypeRoute: ItemsTypeRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

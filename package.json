@@ -22,6 +22,8 @@
     "db:test": "tsx scripts/test-db.ts"
   },
   "dependencies": {
+    "@auth/core": "^0.41.3",
+    "@auth/prisma-adapter": "^2.11.3",
     "@prisma/adapter-pg": "^7.4.2",
     "@prisma/client": "^7.4.2",
     "@tailwindcss/vite": "^4.1.18",
