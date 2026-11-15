@@ -1,34 +1,16 @@
-# Current Feature: Auth Phase 2 (Credentials Provider)
+# Current Feature
 
 ## Status
 
-In Progress
+<!-- Not Started | In Progress | Completed -->
 
 ## Goals
 
-- Add the Credentials provider (email/password) to `src/server/auth.server.ts`, alongside GitHub, with a bcrypt-based `authorize`
-- Keep `session: { strategy: 'jwt' }` (required for Credentials)
-- Create `POST /api/auth/register` as a server route at `src/routes/api/auth/register.ts`
-- Accept `name`, `email`, `password`, `confirmPassword`; validate with Zod (install `zod`)
-- Hash passwords with `bcryptjs` (12 rounds) and create the user via Prisma
-- Return `201` on success, `400` for validation or mismatched passwords, `409` if the email exists, `500` on unexpected errors; never return the password hash
-- Test: register (201), duplicate email (409), mismatched passwords (400), sign in with email/password at `/api/auth/signin` and land on `/dashboard`, `/api/auth/session` returns the user with `id`, GitHub OAuth still works
+<!-- Goals and requirements -->
 
 ## Notes
 
-- Spec: `context/features/auth-phase-2-spec.md`
-- Files: `src/server/auth.server.ts` (Credentials provider), `src/routes/api/auth/register.ts` (new registration route), `src/routes/api/auth/$.ts` and `src/server/auth.functions.ts` unchanged
-- No split config (`auth.config.ts` / `auth.ts`): this is TanStack Start, not Next.js
-- No new migration: `User.password` already exists in `prisma/schema.prisma` and the `init_schema` migration
-- No new env vars; uses the existing `AUTH_SECRET`
-- Registration does not sign the user in; they sign in at `/api/auth/signin` afterward
-- Known edge case, out of scope: a user who registered with email and later signs in with GitHub using the same email hits Auth.js `OAuthAccountNotLinked`
-- Dev server runs on port `4000`
-- Implemented on branch `feature/auth-phase-2`: Zod added (`^4`), Credentials provider in `src/server/auth.server.ts`, registration route `src/routes/api/auth/register.ts` (`name` required, trimmed, email lowercased)
-- Verified: `tsc --noEmit` clean, `npm run build` passes, `biome check` clean on changed files. Dev server via curl: register returns 201 / 409 (duplicate) / 400 (mismatch, short password, bad JSON); `/api/auth/providers` lists credentials; wrong password redirects with `CredentialsSignin`; correct password redirects to `/dashboard`; `/api/auth/session` returns the user with `id`; `/dashboard` returns 200 with the session cookie
-- Test data: user `test@test.com` (password `password123`) was created in the Neon dev branch during testing
-- Not yet verified: GitHub sign-in in a browser after this change; sign-in form in the browser
-- Phase 1 items still unverified in a browser (full GitHub sign-in, `getCurrentUser` with a real session) are not covered by this file; see git history of this file for the Phase 1 notes
+<!-- Any extra notes -->
 
 ## History
 
@@ -46,3 +28,4 @@ In Progress
 - Completed Items and Collections design update with hover animation on branch `feature/hover-animation` (not yet committed or merged): dashboard item and recent collection cards show a 4px colored left border from the item type (collections use their most-used type) instead of a full-border color. A new `HoverCard` component (`src/components/dashboard/HoverCard.tsx`) wraps them in a Motion `motion.li` that lifts 3px with a soft shadow on hover, using a spring transition. Uses the `motion` package (`motion/react`) instead of `framer-motion`. Build passes; not checked in a browser.
 - Completed Add Pro Badge to Sidebar on branch `feature/add-pro-badge-sidebar` (merged to `main`): the dashboard sidebar shows a subtle uppercase `PRO` badge, built with the new ShadCN `Badge` component (`src/components/ui/badge.tsx`), next to the Files and Images types. Build passes; checked in the browser.
 - Completed Code Scanner Quick Wins on branch `feature/code-scanner-quick-wins` (merged to `main`): fixed the `/about` link so `tsc` is clean, formatted mismatched files, and updated the Biome config (schema version, `src/generated` excluded). Renamed the duplicate recent-collection limit constants, added a shared `unwrapResult` helper for query functions, moved `DashboardError` to its own file, and split `SidebarNav` and `SidebarNavSkeleton` out of `Sidebar.tsx`. Derived `ItemRow` from `Prisma.ItemGetPayload`. Added `@@index([userId, updatedAt])` to `Item` and `Collection` via migration `20261113055234_add_updated_at_indexes`, applied to the dev database; prod still needs `prisma migrate deploy`. Build passes; not checked in a browser. Deferred: server-only file moves, grouped type count, pinned item cap, dead header/footer removal, and formatting of the remaining files.
+- Completed Auth Phase 2 (Credentials Provider) on branch `feature/auth-phase-2` (merged to `main`): Credentials (email/password) provider in `src/server/auth.server.ts` with a bcrypt `authorize`, alongside GitHub on JWT sessions. `POST /api/auth/register` in `src/routes/api/auth/register.ts` validates with Zod (new dependency), hashes with bcryptjs (12 rounds), and returns 201, 400, 409, or 500 without the password hash. Verified with curl against the dev server: registration status codes, Credentials sign-in (wrong password rejected, correct password lands on `/dashboard`), and `/api/auth/session` returns the user with `id`. Build passes. Not checked in a browser: sign-in form and GitHub sign-in after this change. Known edge case left out of scope: email/password account signing in with GitHub using the same email hits `OAuthAccountNotLinked`.
