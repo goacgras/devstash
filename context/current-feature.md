@@ -1,4 +1,4 @@
-# Current Feature: Auth Phase 1 (Auth.js + GitHub)
+# Current Feature: Auth Phase 2 (Credentials Provider)
 
 ## Status
 
@@ -6,27 +6,29 @@ In Progress
 
 ## Goals
 
-- Install `@auth/core` and `@auth/prisma-adapter` (not `next-auth`)
-- Add the GitHub OAuth provider
-- Mount the Auth.js handler as a TanStack server route under `/api/auth/*` (`src/routes/api/auth/$.ts`)
-- Provide a `getCurrentUser` server function that returns the session user or `null`
-- Protect `/dashboard` with a `beforeLoad` guard that redirects unauthenticated users to `/api/auth/signin`
-- Augment the Auth.js session/user types with `id` (`src/types/auth.d.ts`)
-- Test: `/dashboard` redirects to sign-in, GitHub sign-in returns to `/dashboard`
+- Add the Credentials provider (email/password) to `src/server/auth.server.ts`, alongside GitHub, with a bcrypt-based `authorize`
+- Keep `session: { strategy: 'jwt' }` (required for Credentials)
+- Create `POST /api/auth/register` as a server route at `src/routes/api/auth/register.ts`
+- Accept `name`, `email`, `password`, `confirmPassword`; validate with Zod (install `zod`)
+- Hash passwords with `bcryptjs` (12 rounds) and create the user via Prisma
+- Return `201` on success, `400` for validation or mismatched passwords, `409` if the email exists, `500` on unexpected errors; never return the password hash
+- Test: register (201), duplicate email (409), mismatched passwords (400), sign in with email/password at `/api/auth/signin` and land on `/dashboard`, `/api/auth/session` returns the user with `id`, GitHub OAuth still works
 
 ## Notes
 
-- Spec: `context/features/auth-phase-1-spec.md`
-- Files: `src/server/auth.server.ts` (config, Prisma adapter, JWT strategy), `src/server/auth.functions.ts`, `src/routes/dashboard.tsx` guard
-- Use `session: { strategy: 'jwt' }` with the Prisma adapter; use Auth.js's built-in sign-in page (no custom `pages.signIn`)
-- No `proxy.ts` or split config: this is TanStack Start, not Next.js
-- `beforeLoad` is UX only; server functions touching private data must check the user themselves
-- Env vars: `AUTH_SECRET`, `AUTH_GITHUB_ID`, `AUTH_GITHUB_SECRET` (server-only, no `VITE_` prefix)
-- GitHub OAuth callback for dev: `http://localhost:4000/api/auth/callback/github`
-- Implemented on branch `feature/auth-phase-1`: `src/server/auth.server.ts` (config with `basePath: '/api/auth'`, JWT, `session.user.id` callback), `src/routes/api/auth/$.ts`, `src/server/auth.functions.ts` (`getCurrentUser` calls `Auth` on `/api/auth/session`), `src/types/auth.d.ts`, `src/types/auth.ts`, and the `/dashboard` `beforeLoad` guard with `Cache-Control: private, no-store`
-- Verified: `tsc --noEmit` clean, `npm run build` passes. Dev server: `/dashboard` redirects to `/api/auth/signin?callbackUrl=%2Fdashboard`, `/api/auth/providers` lists GitHub with the expected callback URL, `/api/auth/session` returns `null` when signed out
-- Not yet verified: full GitHub sign-in in a browser (returns to `/dashboard`) and `getCurrentUser` with a real session
-- Other server functions still use the demo user; data routes are not yet gated by `getCurrentUser`
+- Spec: `context/features/auth-phase-2-spec.md`
+- Files: `src/server/auth.server.ts` (Credentials provider), `src/routes/api/auth/register.ts` (new registration route), `src/routes/api/auth/$.ts` and `src/server/auth.functions.ts` unchanged
+- No split config (`auth.config.ts` / `auth.ts`): this is TanStack Start, not Next.js
+- No new migration: `User.password` already exists in `prisma/schema.prisma` and the `init_schema` migration
+- No new env vars; uses the existing `AUTH_SECRET`
+- Registration does not sign the user in; they sign in at `/api/auth/signin` afterward
+- Known edge case, out of scope: a user who registered with email and later signs in with GitHub using the same email hits Auth.js `OAuthAccountNotLinked`
+- Dev server runs on port `4000`
+- Implemented on branch `feature/auth-phase-2`: Zod added (`^4`), Credentials provider in `src/server/auth.server.ts`, registration route `src/routes/api/auth/register.ts` (`name` required, trimmed, email lowercased)
+- Verified: `tsc --noEmit` clean, `npm run build` passes, `biome check` clean on changed files. Dev server via curl: register returns 201 / 409 (duplicate) / 400 (mismatch, short password, bad JSON); `/api/auth/providers` lists credentials; wrong password redirects with `CredentialsSignin`; correct password redirects to `/dashboard`; `/api/auth/session` returns the user with `id`; `/dashboard` returns 200 with the session cookie
+- Test data: user `test@test.com` (password `password123`) was created in the Neon dev branch during testing
+- Not yet verified: GitHub sign-in in a browser after this change; sign-in form in the browser
+- Phase 1 items still unverified in a browser (full GitHub sign-in, `getCurrentUser` with a real session) are not covered by this file; see git history of this file for the Phase 1 notes
 
 ## History
 
