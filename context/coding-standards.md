@@ -18,7 +18,7 @@
 
 - File-based routing with TanStack Router; routes live in `src/routes/`
 - Routes are SSR by default; keep route components thin and move UI into `src/components/`
-- Use **route loaders** to prefetch data into the TanStack Query cache (`queryClient.ensureQueryData`) so pages render with data on first paint
+- Use **route loaders** to prefetch data into the TanStack Query cache (`queryClient.query(options)`) so pages render with data on first paint
 - Use **server functions** (`createServerFn`) for database access, form submissions, and mutations
 - Use **server routes** (`server.handlers` on a file route) when you need:
   - Webhooks (Stripe, GitHub, etc.)
@@ -91,7 +91,7 @@ Example v4 configuration:
 - Use **TanStack Query** for all data fetching and caching
 - Define query options in factory functions in `src/queries/` so loaders and components share the same keys and `queryFn`
 - Use a consistent query key layout: `['items', { type }]`, `['item', id]`, `['collections']`, `['collection', id]`, `['search', term]`
-- Route loaders prefetch with `ensureQueryData`; components read with `useSuspenseQuery` (or `useQuery` when a loading state is needed)
+- Route loaders prefetch with `queryClient.query(options)` (`ensureQueryData` is deprecated in TanStack Query v5.105); the default `staleTime` is 30s, so client navigations reuse cached data. Components read with `useSuspenseQuery` (or `useQuery` when a loading state is needed)
 - Reads and writes call server functions as the `queryFn` / `mutationFn`
 - Use `useMutation` for all writes and invalidate the affected query keys in `onSuccess`
 - On-demand, cost-sensitive actions (e.g. AI calls) must use `useMutation`, never `useQuery`
