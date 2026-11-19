@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { prisma } from "#/db";
+import { isEmailVerificationEnabled } from "#/server/email-verification.server";
 import { sendVerification } from "#/server/verification.server";
 
 const bodySchema = z.object({
@@ -27,7 +28,11 @@ export const Route = createFileRoute("/api/auth/resend-verification")({
 						select: { emailVerified: true, password: true },
 					});
 					// Same response either way so this can't be used to probe for accounts.
-					if (user?.password && !user.emailVerified) {
+					if (
+						isEmailVerificationEnabled() &&
+						user?.password &&
+						!user.emailVerified
+					) {
 						await sendVerification(email, new URL(request.url).origin);
 					}
 					return Response.json({ success: true });

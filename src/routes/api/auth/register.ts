@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import bcrypt from "bcryptjs";
 import { prisma } from "#/db";
 import { registerSchema } from "#/lib/validations/auth";
+import { isEmailVerificationEnabled } from "#/server/email-verification.server";
 import { sendVerification } from "#/server/verification.server";
 
 const BCRYPT_ROUNDS = 12;
@@ -57,10 +58,23 @@ export const Route = createFileRoute("/api/auth/register")({
 					}
 
 					const hashedPassword = await bcrypt.hash(password, BCRYPT_ROUNDS);
+					const verificationRequired = isEmailVerificationEnabled();
 					const user = await prisma.user.create({
-						data: { name, email, password: hashedPassword },
+						data: {
+							name,
+							email,
+							password: hashedPassword,
+							emailVerified: verificationRequired ? null : new Date(),
+						},
 						select: { id: true, name: true, email: true },
 					});
+
+					if (!verificationRequired) {
+						return jsonResponse(
+							{ success: true, data: user, verificationRequired },
+							201,
+						);
+					}
 
 					try {
 						await sendVerification(email, new URL(request.url).origin);
@@ -80,7 +94,10 @@ export const Route = createFileRoute("/api/auth/register")({
 						);
 					}
 
-					return jsonResponse({ success: true, data: user }, 201);
+					return jsonResponse(
+						{ success: true, data: user, verificationRequired },
+						201,
+					);
 				} catch (error) {
 					if (isUniqueConstraintError(error)) {
 						return jsonResponse(
