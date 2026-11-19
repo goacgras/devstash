@@ -1,16 +1,29 @@
-# Current Feature
+# Current Feature: Email Verification Toggle
 
 ## Status
 
-<!-- Not Started | In Progress | Completed -->
+In Progress
 
 ## Goals
 
-<!-- Goals and requirements -->
+- Add a single flag, `EMAIL_VERIFICATION_ENABLED`, that turns email verification on or off without code changes.
+- Default to enabled when the variable is unset, so production behavior doesn't change by accident.
+- When disabled:
+  - `POST /api/auth/register` skips creating a token and sending the email, and creates the user with `emailVerified` set to now.
+  - Credentials `authorize` doesn't block sign-in for unverified users.
+  - The register form skips the "check your email" state and sends the user on as for a normal sign-up (sign-in page with the success toast).
+  - The sign-in form hides the resend-verification button.
+  - `POST /api/auth/resend-verification` returns its usual generic response without sending anything.
+  - `RESEND_API_KEY` isn't required.
+- When enabled, behavior stays exactly as it is today.
 
 ## Notes
 
-<!-- Any extra notes -->
+- The flag is read in one helper (e.g. `isEmailVerificationEnabled()` in a `*.server.ts` file) so every server path shares it. Parse it strictly (`"false"`/`"0"` disable; anything else enables).
+- The client forms need to know the state without a secret leaking. Prefer having the register response indicate whether verification is required (e.g. `data.verificationRequired`) and exposing the flag to the sign-in form through the route loader or a server function, over a `VITE_` variable, which would be baked in at build time and need a rebuild to change.
+- Reason: no domain is linked to Resend yet, so only the Resend account owner's address can receive mail. Disabling verification lets anyone register in dev.
+- Document the variable in the README or env docs if one exists (there is no `.env.example` right now).
+- Accounts created while disabled get `emailVerified` set, so turning the flag back on won't lock them out.
 
 ## History
 

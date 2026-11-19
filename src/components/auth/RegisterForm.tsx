@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { type FormEvent, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "#/components/ui/button";
@@ -13,6 +13,7 @@ import FormField from "./FormField";
 interface RegisterResponse {
 	success: boolean;
 	error?: string;
+	verificationRequired?: boolean;
 }
 
 interface RegisterValues {
@@ -22,7 +23,9 @@ interface RegisterValues {
 	confirmPassword: string;
 }
 
-async function registerUser(values: RegisterValues): Promise<void> {
+async function registerUser(
+	values: RegisterValues,
+): Promise<RegisterResponse> {
 	const response = await fetch("/api/auth/register", {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
@@ -32,15 +35,25 @@ async function registerUser(values: RegisterValues): Promise<void> {
 	if (!response.ok || !data.success) {
 		throw new Error(data.error ?? "Something went wrong");
 	}
+	return data;
 }
 
 export default function RegisterForm() {
 	const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 	const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
 
+	const navigate = useNavigate();
+
 	const mutation = useMutation({
 		mutationFn: registerUser,
-		onSuccess: (_data, values) => setRegisteredEmail(values.email),
+		onSuccess: (data, values) => {
+			if (data.verificationRequired === false) {
+				toast.success("Account created. You can sign in now.");
+				void navigate({ to: "/sign-in", search: {} });
+				return;
+			}
+			setRegisteredEmail(values.email);
+		},
 		onError: (error) => toast.error(error.message),
 	});
 
