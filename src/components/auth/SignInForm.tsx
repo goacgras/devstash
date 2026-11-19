@@ -41,6 +41,10 @@ export default function SignInForm({
 		mutationFn: () => resendVerification(email),
 		onSuccess: () =>
 			toast.success("Verification email sent. Check your inbox."),
+		onError: () =>
+			toast.error(
+				"We couldn't send the verification email. Please try again later.",
+			),
 	});
 	const githubMutation = useMutation({
 		mutationFn: () => signInWithGitHub(redirectTo),
