@@ -1,31 +1,19 @@
-# Current Feature: Email Verification Toggle
+# Current Feature
 
 ## Status
 
-In Progress
+<!-- Not Started | In Progress | Completed -->
 
 ## Goals
 
-- Add a single flag, `EMAIL_VERIFICATION_ENABLED`, that turns email verification on or off without code changes.
-- Default to enabled when the variable is unset, so production behavior doesn't change by accident.
-- When disabled:
-  - `POST /api/auth/register` skips creating a token and sending the email, and creates the user with `emailVerified` set to now.
-  - Credentials `authorize` doesn't block sign-in for unverified users.
-  - The register form skips the "check your email" state and sends the user on as for a normal sign-up (sign-in page with the success toast).
-  - The sign-in form hides the resend-verification button.
-  - `POST /api/auth/resend-verification` returns its usual generic response without sending anything.
-  - `RESEND_API_KEY` isn't required.
-- When enabled, behavior stays exactly as it is today.
+<!-- Goals and requirements -->
 
 ## Notes
 
-- The flag is read in one helper (e.g. `isEmailVerificationEnabled()` in a `*.server.ts` file) so every server path shares it. Parse it strictly (`"false"`/`"0"` disable; anything else enables).
-- The client forms need to know the state without a secret leaking. Prefer having the register response indicate whether verification is required (e.g. `data.verificationRequired`) and exposing the flag to the sign-in form through the route loader or a server function, over a `VITE_` variable, which would be baked in at build time and need a rebuild to change.
-- Reason: no domain is linked to Resend yet, so only the Resend account owner's address can receive mail. Disabling verification lets anyone register in dev.
-- Document the variable in the README or env docs if one exists (there is no `.env.example` right now).
-- Accounts created while disabled get `emailVerified` set, so turning the flag back on won't lock them out.
+<!-- Any extra notes -->
 
 ## History
+
 
 <!-- Keep this updated. Earliest to latest. List completed features only. -->
 
@@ -46,3 +34,4 @@ In Progress
 - Completed Auth Phase 3 (Custom Sign In, Register & Sign Out UI) on branch `feature/auth-phase-3` (merged to `main`): custom `/sign-in` and `/register` pages (Zod validation shared via `src/lib/validations/auth.ts`, same-origin `redirect` param, signed-in users redirected to `/dashboard`), protected placeholder `/profile`, `pages.signIn` set in Auth.js, `/dashboard` guard now uses `requireUser` (`src/lib/auth-guard.ts`) and redirects to `/sign-in`. Browser helpers in `src/lib/auth-client.ts` call the Auth.js endpoints directly (CSRF token, credentials sign-in via the `X-Auth-Return-Redirect: 1` header, form posts for GitHub and sign out). Sidebar user area shows the real session user via a reusable `UserAvatar` (GitHub image or initials) with an upward dropdown for sign out; `mock-data.ts` removed. Added shadcn `dropdown-menu`, `label` and `sonner` (success toast after registration, dark theme only, no `next-themes`). Dashboard layout is now one screen tall so only the main content scrolls and the sidebar stays fixed. Verified: `tsc --noEmit` clean, build passes, `/sign-in` and `/register` render, `/dashboard` and `/profile` redirect to `/sign-in` when signed out, failed credentials login returns the `CredentialsSignin` error URL. Not checked in a browser: GitHub sign-in, successful credentials sign-in, sign out, registration toast, and the sidebar scroll behavior.
 - Completed Email Verification on Register on branch `feature/email-verification` (merged to `main`): registration creates a SHA-256-hashed `VerificationToken` (24h expiry) and emails a link via Resend (`src/server/email.server.ts`, `src/server/verification.server.ts`; sender from `EMAIL_FROM`, default `onboarding@resend.dev`; link origin taken from the request). `GET /api/auth/verify-email` sets `emailVerified`, consumes the token, and redirects to `/sign-in?verify=…`; `POST /api/auth/resend-verification` gives the same response whether or not the account exists. Credentials `authorize` throws `EmailNotVerified` for unverified users; the sign-in form shows the verify result and a resend button, and the register form shows a check-your-email state (account is still created if the send fails). Added `resend` and `scripts/delete-users.ts` (`npm run db:delete-users`, dry run unless `--yes`; deletes all users except `demo@devstash.io`). Verified with curl: registration, unverified sign-in blocked, invalid/valid/reused token, sign-in after verifying; `tsc` clean, build passes. Not verified: actual email delivery (Resend send failed in dev; needs a verified domain or the account owner's address), and the UI in a browser. Existing credentials users other than the demo user must verify or be backfilled.
 - Completed Verification Email Error Message on branch `feature/verification-email-error` (merged to `main`): `POST /api/auth/register` now rolls back the new user and its verification token when sending the verification email fails, and returns a 502 with a generic message (no provider details). The register form shows that message as a toast and inline; the `emailSent` flag and the "account created but email failed" state were removed. The sign-in form's resend button shows an error toast when the resend fails. `tsc` clean and build passes; not checked in a browser. Accounts left by earlier failed attempts can be cleared with `npm run db:delete-users`.
+- Completed Email Verification Toggle on branch `feature/email-verification-toggle` (merged to `main`): new `EMAIL_VERIFICATION_ENABLED` env flag (set in `.env.local`; `false` or `0` disables, unset or anything else enables), read through `isEmailVerificationEnabled()` in `src/server/email-verification.server.ts`. When disabled, `POST /api/auth/register` creates the user with `emailVerified` set and sends no email, credentials sign-in no longer blocks unverified users, and `resend-verification` sends nothing. Register responses now include `verificationRequired`; the register form shows a success toast and goes to `/sign-in` when it is false. The sign-in form needed no change since the resend button only appears after an unverified error. `tsc` clean and build passes; verified with curl against a dev server with the flag off (register, sign-in, session, resend); not re-tested with the flag on or in a browser. In production, set the variable in the host environment.
