@@ -1,22 +1,16 @@
-# Current Feature: Verification Email Error Message
+# Current Feature
 
 ## Status
 
-In Progress
+<!-- Not Started | In Progress | Completed -->
 
 ## Goals
 
-- Show a clear error message in the UI when sending the verification email fails, for any reason (not only the Resend testing-domain restriction).
-- Do not keep the account when the verification email fails to send: roll back the user and token, and return an error so the user can retry registration.
-- The user can simply retry registering with the same email.
-- Do not leak provider error details (such as the account owner's email address) to the client.
+<!-- Goals and requirements -->
 
 ## Notes
 
-- Today `POST /api/auth/register` (`src/routes/api/auth/register.ts`) catches the send error, logs it, and returns `emailSent: false` with a 201. The register form does not surface this.
-- Trigger seen in dev: Resend rejects recipients other than the account owner's address until a domain is verified (`src/server/email.server.ts:25`).
-- Related files: `src/server/verification.server.ts`, `src/server/email.server.ts`, the register form, and the sign-in form's resend flow.
-- Error text should follow the project convention of user-friendly messages (toast or inline).
+<!-- Any extra notes -->
 
 ## History
 
@@ -38,3 +32,4 @@ In Progress
 - Completed Auth Phase 2 (Credentials Provider) on branch `feature/auth-phase-2` (merged to `main`): Credentials (email/password) provider in `src/server/auth.server.ts` with a bcrypt `authorize`, alongside GitHub on JWT sessions. `POST /api/auth/register` in `src/routes/api/auth/register.ts` validates with Zod (new dependency), hashes with bcryptjs (12 rounds), and returns 201, 400, 409, or 500 without the password hash. Verified with curl against the dev server: registration status codes, Credentials sign-in (wrong password rejected, correct password lands on `/dashboard`), and `/api/auth/session` returns the user with `id`. Build passes. Not checked in a browser: sign-in form and GitHub sign-in after this change. Known edge case left out of scope: email/password account signing in with GitHub using the same email hits `OAuthAccountNotLinked`.
 - Completed Auth Phase 3 (Custom Sign In, Register & Sign Out UI) on branch `feature/auth-phase-3` (merged to `main`): custom `/sign-in` and `/register` pages (Zod validation shared via `src/lib/validations/auth.ts`, same-origin `redirect` param, signed-in users redirected to `/dashboard`), protected placeholder `/profile`, `pages.signIn` set in Auth.js, `/dashboard` guard now uses `requireUser` (`src/lib/auth-guard.ts`) and redirects to `/sign-in`. Browser helpers in `src/lib/auth-client.ts` call the Auth.js endpoints directly (CSRF token, credentials sign-in via the `X-Auth-Return-Redirect: 1` header, form posts for GitHub and sign out). Sidebar user area shows the real session user via a reusable `UserAvatar` (GitHub image or initials) with an upward dropdown for sign out; `mock-data.ts` removed. Added shadcn `dropdown-menu`, `label` and `sonner` (success toast after registration, dark theme only, no `next-themes`). Dashboard layout is now one screen tall so only the main content scrolls and the sidebar stays fixed. Verified: `tsc --noEmit` clean, build passes, `/sign-in` and `/register` render, `/dashboard` and `/profile` redirect to `/sign-in` when signed out, failed credentials login returns the `CredentialsSignin` error URL. Not checked in a browser: GitHub sign-in, successful credentials sign-in, sign out, registration toast, and the sidebar scroll behavior.
 - Completed Email Verification on Register on branch `feature/email-verification` (merged to `main`): registration creates a SHA-256-hashed `VerificationToken` (24h expiry) and emails a link via Resend (`src/server/email.server.ts`, `src/server/verification.server.ts`; sender from `EMAIL_FROM`, default `onboarding@resend.dev`; link origin taken from the request). `GET /api/auth/verify-email` sets `emailVerified`, consumes the token, and redirects to `/sign-in?verify=…`; `POST /api/auth/resend-verification` gives the same response whether or not the account exists. Credentials `authorize` throws `EmailNotVerified` for unverified users; the sign-in form shows the verify result and a resend button, and the register form shows a check-your-email state (account is still created if the send fails). Added `resend` and `scripts/delete-users.ts` (`npm run db:delete-users`, dry run unless `--yes`; deletes all users except `demo@devstash.io`). Verified with curl: registration, unverified sign-in blocked, invalid/valid/reused token, sign-in after verifying; `tsc` clean, build passes. Not verified: actual email delivery (Resend send failed in dev; needs a verified domain or the account owner's address), and the UI in a browser. Existing credentials users other than the demo user must verify or be backfilled.
+- Completed Verification Email Error Message on branch `feature/verification-email-error` (merged to `main`): `POST /api/auth/register` now rolls back the new user and its verification token when sending the verification email fails, and returns a 502 with a generic message (no provider details). The register form shows that message as a toast and inline; the `emailSent` flag and the "account created but email failed" state were removed. The sign-in form's resend button shows an error toast when the resend fails. `tsc` clean and build passes; not checked in a browser. Accounts left by earlier failed attempts can be cleared with `npm run db:delete-users`.
