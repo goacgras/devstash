@@ -1,30 +1,16 @@
-# Current Feature: Auth Phase 3 (Custom Sign In, Register & Sign Out UI)
+# Current Feature
 
 ## Status
 
-In Progress
+<!-- Not Started | In Progress | Completed -->
 
 ## Goals
 
-- Custom `/sign-in` page: email/password form, "Sign in with GitHub" button, link to `/register`, inline validation and error display, `redirect` search param (Zod-validated, same-origin only, default `/dashboard`); signed-in users redirect to `/dashboard`
-- Custom `/register` page: name, email, password, confirm password; client validation with the shared Zod schema; submits to `POST /api/auth/register`; shows `400`/`409` errors; redirects to `/sign-in` on success; signed-in users redirect to `/dashboard`
-- Sidebar bottom (`SidebarUserArea`) uses the real session user instead of `MOCK_USER`: avatar (GitHub image or initials), name, email
-- Clicking the avatar/name links to `/profile` (placeholder route, protected)
-- Upward dropdown next to the user info with a "Sign out" action
-- Reusable `UserAvatar` component (image with initials fallback; "Brad Traversy" -> "BT")
-- Auth.js `pages.signIn` set to `/sign-in`; `/dashboard` guard redirects to `/sign-in` instead of `/api/auth/signin`
+<!-- Goals and requirements -->
 
 ## Notes
 
-- Spec: `context/features/auth-phase-3-spec.md`
-- No `next-auth`; call Auth.js HTTP endpoints from the browser via `src/lib/auth-client.ts`: `GET /api/auth/csrf`, `POST /api/auth/callback/credentials` (with `X-Auth-Return-Redirect: 1` header to get JSON `{ url }`), form post to `/api/auth/signin/github`, form post to `/api/auth/signout`. Verify against Auth.js docs
-- Files to create: `src/routes/sign-in.tsx`, `register.tsx`, `profile.tsx`; `src/components/auth/SignInForm.tsx`, `RegisterForm.tsx`; `src/components/ui/UserAvatar.tsx`; `src/lib/auth-client.ts`; `src/lib/validations/auth.ts`
-- Files to modify: `src/server/auth.server.ts`, `src/routes/api/auth/register.ts` (shared Zod schema), `src/routes/dashboard.tsx`, `SidebarUserArea.tsx`, `Sidebar.tsx`, `src/lib/mock-data.ts` (remove mock user)
-- Use `useMutation` for submits; shadcn `Button`/`Input` plus `Label` and `DropdownMenu` if needed; Tailwind v4 only
-- After sign-in/sign-out, do a full navigation or `router.invalidate()` so the session refreshes
-- Optional pathless `_authed` layout: ask before refactoring `/dashboard`
-- No new env vars; dev server on port 4000
-- Verify with `npx tsc --noEmit` and `npm run build`
+<!-- Any extra notes -->
 
 ## History
 
@@ -44,3 +30,4 @@ In Progress
 - Completed Code Scanner Quick Wins on branch `feature/code-scanner-quick-wins` (merged to `main`): fixed the `/about` link so `tsc` is clean, formatted mismatched files, and updated the Biome config (schema version, `src/generated` excluded). Renamed the duplicate recent-collection limit constants, added a shared `unwrapResult` helper for query functions, moved `DashboardError` to its own file, and split `SidebarNav` and `SidebarNavSkeleton` out of `Sidebar.tsx`. Derived `ItemRow` from `Prisma.ItemGetPayload`. Added `@@index([userId, updatedAt])` to `Item` and `Collection` via migration `20261113055234_add_updated_at_indexes`, applied to the dev database; prod still needs `prisma migrate deploy`. Build passes; not checked in a browser. Deferred: server-only file moves, grouped type count, pinned item cap, dead header/footer removal, and formatting of the remaining files.
 - Completed Auth Phase 1 (Auth.js + GitHub) on branch `feature/auth-phase-1` (merged to `main`): Auth.js with `@auth/core` and `@auth/prisma-adapter` (not `next-auth`), GitHub OAuth provider, JWT sessions, Auth.js handler mounted as a TanStack server route at `/api/auth/*` (`src/routes/api/auth/$.ts`), `getCurrentUser` server function in `src/server/auth.functions.ts`, `/dashboard` `beforeLoad` guard redirecting to `/api/auth/signin`, and session/user types augmented with `id` in `src/types/auth.d.ts`. Verified: `tsc --noEmit` clean, build passes, `/dashboard` redirects to sign-in, `/api/auth/providers` lists GitHub with the expected callback URL, `/api/auth/session` returns `null` when signed out. Not verified in a browser: full GitHub sign-in returning to `/dashboard`, and `getCurrentUser` with a real session.
 - Completed Auth Phase 2 (Credentials Provider) on branch `feature/auth-phase-2` (merged to `main`): Credentials (email/password) provider in `src/server/auth.server.ts` with a bcrypt `authorize`, alongside GitHub on JWT sessions. `POST /api/auth/register` in `src/routes/api/auth/register.ts` validates with Zod (new dependency), hashes with bcryptjs (12 rounds), and returns 201, 400, 409, or 500 without the password hash. Verified with curl against the dev server: registration status codes, Credentials sign-in (wrong password rejected, correct password lands on `/dashboard`), and `/api/auth/session` returns the user with `id`. Build passes. Not checked in a browser: sign-in form and GitHub sign-in after this change. Known edge case left out of scope: email/password account signing in with GitHub using the same email hits `OAuthAccountNotLinked`.
+- Completed Auth Phase 3 (Custom Sign In, Register & Sign Out UI) on branch `feature/auth-phase-3` (merged to `main`): custom `/sign-in` and `/register` pages (Zod validation shared via `src/lib/validations/auth.ts`, same-origin `redirect` param, signed-in users redirected to `/dashboard`), protected placeholder `/profile`, `pages.signIn` set in Auth.js, `/dashboard` guard now uses `requireUser` (`src/lib/auth-guard.ts`) and redirects to `/sign-in`. Browser helpers in `src/lib/auth-client.ts` call the Auth.js endpoints directly (CSRF token, credentials sign-in via the `X-Auth-Return-Redirect: 1` header, form posts for GitHub and sign out). Sidebar user area shows the real session user via a reusable `UserAvatar` (GitHub image or initials) with an upward dropdown for sign out; `mock-data.ts` removed. Added shadcn `dropdown-menu`, `label` and `sonner` (success toast after registration, dark theme only, no `next-themes`). Dashboard layout is now one screen tall so only the main content scrolls and the sidebar stays fixed. Verified: `tsc --noEmit` clean, build passes, `/sign-in` and `/register` render, `/dashboard` and `/profile` redirect to `/sign-in` when signed out, failed credentials login returns the `CredentialsSignin` error URL. Not checked in a browser: GitHub sign-in, successful credentials sign-in, sign out, registration toast, and the sidebar scroll behavior.
