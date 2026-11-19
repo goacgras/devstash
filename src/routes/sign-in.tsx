@@ -8,6 +8,7 @@ import { getCurrentUser } from "#/server/auth.functions";
 const searchSchema = z.object({
 	redirect: redirectSchema,
 	error: z.string().optional().catch(undefined),
+	verify: z.string().optional().catch(undefined),
 });
 
 export const Route = createFileRoute("/sign-in")({
@@ -22,13 +23,14 @@ export const Route = createFileRoute("/sign-in")({
 });
 
 function SignIn() {
-	const { redirect: redirectTo, error } = Route.useSearch();
+	const { redirect: redirectTo, error, verify } = Route.useSearch();
 
 	return (
 		<AuthCard title="Sign in to DevStash" description="Welcome back">
 			<SignInForm
 				redirectTo={redirectTo ?? DEFAULT_REDIRECT}
 				errorCode={error}
+				verifyStatus={verify}
 			/>
 		</AuthCard>
 	);
