@@ -62,15 +62,25 @@ export const Route = createFileRoute("/api/auth/register")({
 						select: { id: true, name: true, email: true },
 					});
 
-					let emailSent = true;
 					try {
 						await sendVerification(email, new URL(request.url).origin);
 					} catch (error) {
-						emailSent = false;
 						console.error("Sending verification email failed", error);
+						await prisma.verificationToken.deleteMany({
+							where: { identifier: email },
+						});
+						await prisma.user.delete({ where: { id: user.id } });
+						return jsonResponse(
+							{
+								success: false,
+								error:
+									"We couldn't send the verification email, so your account wasn't created. Please try again later.",
+							},
+							502,
+						);
 					}
 
-					return jsonResponse({ success: true, data: user, emailSent }, 201);
+					return jsonResponse({ success: true, data: user }, 201);
 				} catch (error) {
 					if (isUniqueConstraintError(error)) {
 						return jsonResponse(

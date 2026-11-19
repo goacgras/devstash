@@ -1,16 +1,22 @@
-# Current Feature
+# Current Feature: Verification Email Error Message
 
 ## Status
 
-<!-- Not Started | In Progress | Completed -->
+In Progress
 
 ## Goals
 
-<!-- Goals and requirements -->
+- Show a clear error message in the UI when sending the verification email fails, for any reason (not only the Resend testing-domain restriction).
+- Do not keep the account when the verification email fails to send: roll back the user and token, and return an error so the user can retry registration.
+- The user can simply retry registering with the same email.
+- Do not leak provider error details (such as the account owner's email address) to the client.
 
 ## Notes
 
-<!-- Any extra notes -->
+- Today `POST /api/auth/register` (`src/routes/api/auth/register.ts`) catches the send error, logs it, and returns `emailSent: false` with a 201. The register form does not surface this.
+- Trigger seen in dev: Resend rejects recipients other than the account owner's address until a domain is verified (`src/server/email.server.ts:25`).
+- Related files: `src/server/verification.server.ts`, `src/server/email.server.ts`, the register form, and the sign-in form's resend flow.
+- Error text should follow the project convention of user-friendly messages (toast or inline).
 
 ## History
 

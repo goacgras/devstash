@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { type FormEvent, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "#/components/ui/button";
 import {
 	type FieldErrors,
@@ -11,7 +12,6 @@ import FormField from "./FormField";
 
 interface RegisterResponse {
 	success: boolean;
-	emailSent?: boolean;
 	error?: string;
 }
 
@@ -22,7 +22,7 @@ interface RegisterValues {
 	confirmPassword: string;
 }
 
-async function registerUser(values: RegisterValues): Promise<boolean> {
+async function registerUser(values: RegisterValues): Promise<void> {
 	const response = await fetch("/api/auth/register", {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
@@ -32,20 +32,16 @@ async function registerUser(values: RegisterValues): Promise<boolean> {
 	if (!response.ok || !data.success) {
 		throw new Error(data.error ?? "Something went wrong");
 	}
-	return data.emailSent !== false;
 }
 
 export default function RegisterForm() {
 	const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
-	const [registered, setRegistered] = useState<{
-		email: string;
-		emailSent: boolean;
-	} | null>(null);
+	const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
 
 	const mutation = useMutation({
 		mutationFn: registerUser,
-		onSuccess: (emailSent, values) =>
-			setRegistered({ email: values.email, emailSent }),
+		onSuccess: (_data, values) => setRegisteredEmail(values.email),
+		onError: (error) => toast.error(error.message),
 	});
 
 	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -66,13 +62,12 @@ export default function RegisterForm() {
 		mutation.mutate(values);
 	};
 
-	if (registered) {
+	if (registeredEmail) {
 		return (
 			<div className="space-y-4 text-center">
 				<p className="text-sm">
-					{registered.emailSent
-						? `We sent a verification link to ${registered.email}. Click it to activate your account.`
-						: "Your account was created, but we couldn't send the verification email. Sign in to request a new one."}
+					We sent a verification link to {registeredEmail}. Click it to activate
+					your account.
 				</p>
 				<Link to="/sign-in" search={{}} className="text-sm underline">
 					Go to sign in
