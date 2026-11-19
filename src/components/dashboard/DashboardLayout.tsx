@@ -17,7 +17,7 @@ export default function DashboardLayout() {
 	const closeMobileSidebar = () => setIsMobileSidebarOpen(false);
 
 	return (
-		<div className="flex min-h-screen bg-background text-foreground">
+		<div className="flex h-screen overflow-hidden bg-background text-foreground">
 			<Sidebar
 				isDesktopOpen={isDesktopSidebarOpen}
 				isMobileOpen={isMobileSidebarOpen}
@@ -31,7 +31,7 @@ export default function DashboardLayout() {
 					className="fixed inset-0 z-30 bg-black/50 md:hidden"
 				/>
 			) : null}
-			<div className="flex min-w-0 flex-1 flex-col">
+			<div className="flex min-w-0 flex-1 flex-col overflow-hidden">
 				<DashboardTopBar onToggleSidebar={toggleSidebar} />
 				<DashboardMain />
 			</div>

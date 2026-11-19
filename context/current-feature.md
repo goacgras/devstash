@@ -1,16 +1,30 @@
-# Current Feature
+# Current Feature: Auth Phase 3 (Custom Sign In, Register & Sign Out UI)
 
 ## Status
 
-<!-- Not Started | In Progress | Completed -->
+In Progress
 
 ## Goals
 
-<!-- Goals and requirements -->
+- Custom `/sign-in` page: email/password form, "Sign in with GitHub" button, link to `/register`, inline validation and error display, `redirect` search param (Zod-validated, same-origin only, default `/dashboard`); signed-in users redirect to `/dashboard`
+- Custom `/register` page: name, email, password, confirm password; client validation with the shared Zod schema; submits to `POST /api/auth/register`; shows `400`/`409` errors; redirects to `/sign-in` on success; signed-in users redirect to `/dashboard`
+- Sidebar bottom (`SidebarUserArea`) uses the real session user instead of `MOCK_USER`: avatar (GitHub image or initials), name, email
+- Clicking the avatar/name links to `/profile` (placeholder route, protected)
+- Upward dropdown next to the user info with a "Sign out" action
+- Reusable `UserAvatar` component (image with initials fallback; "Brad Traversy" -> "BT")
+- Auth.js `pages.signIn` set to `/sign-in`; `/dashboard` guard redirects to `/sign-in` instead of `/api/auth/signin`
 
 ## Notes
 
-<!-- Any extra notes -->
+- Spec: `context/features/auth-phase-3-spec.md`
+- No `next-auth`; call Auth.js HTTP endpoints from the browser via `src/lib/auth-client.ts`: `GET /api/auth/csrf`, `POST /api/auth/callback/credentials` (with `X-Auth-Return-Redirect: 1` header to get JSON `{ url }`), form post to `/api/auth/signin/github`, form post to `/api/auth/signout`. Verify against Auth.js docs
+- Files to create: `src/routes/sign-in.tsx`, `register.tsx`, `profile.tsx`; `src/components/auth/SignInForm.tsx`, `RegisterForm.tsx`; `src/components/ui/UserAvatar.tsx`; `src/lib/auth-client.ts`; `src/lib/validations/auth.ts`
+- Files to modify: `src/server/auth.server.ts`, `src/routes/api/auth/register.ts` (shared Zod schema), `src/routes/dashboard.tsx`, `SidebarUserArea.tsx`, `Sidebar.tsx`, `src/lib/mock-data.ts` (remove mock user)
+- Use `useMutation` for submits; shadcn `Button`/`Input` plus `Label` and `DropdownMenu` if needed; Tailwind v4 only
+- After sign-in/sign-out, do a full navigation or `router.invalidate()` so the session refreshes
+- Optional pathless `_authed` layout: ask before refactoring `/dashboard`
+- No new env vars; dev server on port 4000
+- Verify with `npx tsc --noEmit` and `npm run build`
 
 ## History
 

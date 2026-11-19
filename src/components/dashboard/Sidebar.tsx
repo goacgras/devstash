@@ -1,6 +1,6 @@
+import { getRouteApi } from "@tanstack/react-router";
 import { Layers } from "lucide-react";
 import { Suspense } from "react";
-import { MOCK_USER } from "#/lib/mock-data";
 import { cn } from "#/lib/utils";
 import SidebarNav from "./SidebarNav";
 import SidebarNavSkeleton from "./SidebarNavSkeleton";
@@ -12,11 +12,15 @@ interface SidebarProps {
 	onNavigate: () => void;
 }
 
+const dashboardRoute = getRouteApi("/dashboard");
+
 export default function Sidebar({
 	isDesktopOpen,
 	isMobileOpen,
 	onNavigate,
 }: SidebarProps) {
+	const { user } = dashboardRoute.useRouteContext();
+
 	return (
 		<aside
 			className={cn(
@@ -38,7 +42,7 @@ export default function Sidebar({
 						<SidebarNav onNavigate={onNavigate} />
 					</Suspense>
 				</nav>
-				<SidebarUserArea user={MOCK_USER} />
+				<SidebarUserArea user={user} />
 			</div>
 		</aside>
 	);

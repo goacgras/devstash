@@ -46,6 +46,7 @@ export const authConfig = {
 			},
 		}),
 	],
+	pages: { signIn: "/sign-in" },
 	secret: process.env.AUTH_SECRET,
 	trustHost: true,
 	session: { strategy: "jwt" },

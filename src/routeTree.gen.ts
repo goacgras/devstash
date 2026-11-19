@@ -12,6 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CollectionsRouteImport } from './routes/collections'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as ItemsTypeRouteImport } from './routes/items/$type'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiAuthRegisterRouteImport } from './routes/api/auth/register'
@@ -29,6 +32,21 @@ const CollectionsRoute = CollectionsRouteImport.update({
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignInRoute = SignInRouteImport.update({
+  id: '/sign-in',
+  path: '/sign-in',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ItemsTypeRoute = ItemsTypeRouteImport.update({
@@ -51,6 +69,9 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/collections': typeof CollectionsRoute
   '/dashboard': typeof DashboardRoute
+  '/profile': typeof ProfileRoute
+  '/register': typeof RegisterRoute
+  '/sign-in': typeof SignInRoute
   '/items/$type': typeof ItemsTypeRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/auth/register': typeof ApiAuthRegisterRoute
@@ -59,6 +80,9 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/collections': typeof CollectionsRoute
   '/dashboard': typeof DashboardRoute
+  '/profile': typeof ProfileRoute
+  '/register': typeof RegisterRoute
+  '/sign-in': typeof SignInRoute
   '/items/$type': typeof ItemsTypeRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/auth/register': typeof ApiAuthRegisterRoute
@@ -68,6 +92,9 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/collections': typeof CollectionsRoute
   '/dashboard': typeof DashboardRoute
+  '/profile': typeof ProfileRoute
+  '/register': typeof RegisterRoute
+  '/sign-in': typeof SignInRoute
   '/items/$type': typeof ItemsTypeRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/auth/register': typeof ApiAuthRegisterRoute
@@ -78,6 +105,9 @@ export interface FileRouteTypes {
     | '/'
     | '/collections'
     | '/dashboard'
+    | '/profile'
+    | '/register'
+    | '/sign-in'
     | '/items/$type'
     | '/api/auth/$'
     | '/api/auth/register'
@@ -86,6 +116,9 @@ export interface FileRouteTypes {
     | '/'
     | '/collections'
     | '/dashboard'
+    | '/profile'
+    | '/register'
+    | '/sign-in'
     | '/items/$type'
     | '/api/auth/$'
     | '/api/auth/register'
@@ -94,6 +127,9 @@ export interface FileRouteTypes {
     | '/'
     | '/collections'
     | '/dashboard'
+    | '/profile'
+    | '/register'
+    | '/sign-in'
     | '/items/$type'
     | '/api/auth/$'
     | '/api/auth/register'
@@ -103,6 +139,9 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CollectionsRoute: typeof CollectionsRoute
   DashboardRoute: typeof DashboardRoute
+  ProfileRoute: typeof ProfileRoute
+  RegisterRoute: typeof RegisterRoute
+  SignInRoute: typeof SignInRoute
   ItemsTypeRoute: typeof ItemsTypeRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiAuthRegisterRoute: typeof ApiAuthRegisterRoute
@@ -129,6 +168,27 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sign-in': {
+      id: '/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
+      preLoaderRoute: typeof SignInRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/items/$type': {
@@ -159,6 +219,9 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CollectionsRoute: CollectionsRoute,
   DashboardRoute: DashboardRoute,
+  ProfileRoute: ProfileRoute,
+  RegisterRoute: RegisterRoute,
+  SignInRoute: SignInRoute,
   ItemsTypeRoute: ItemsTypeRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiAuthRegisterRoute: ApiAuthRegisterRoute,
