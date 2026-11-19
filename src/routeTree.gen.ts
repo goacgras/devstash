@@ -18,6 +18,8 @@ import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as ItemsTypeRouteImport } from './routes/items/$type'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiAuthRegisterRouteImport } from './routes/api/auth/register'
+import { Route as ApiAuthResendVerificationRouteImport } from './routes/api/auth/resend-verification'
+import { Route as ApiAuthVerifyEmailRouteImport } from './routes/api/auth/verify-email'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -64,6 +66,17 @@ const ApiAuthRegisterRoute = ApiAuthRegisterRouteImport.update({
   path: '/api/auth/register',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAuthResendVerificationRoute =
+  ApiAuthResendVerificationRouteImport.update({
+    id: '/api/auth/resend-verification',
+    path: '/api/auth/resend-verification',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiAuthVerifyEmailRoute = ApiAuthVerifyEmailRouteImport.update({
+  id: '/api/auth/verify-email',
+  path: '/api/auth/verify-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -75,6 +88,8 @@ export interface FileRoutesByFullPath {
   '/items/$type': typeof ItemsTypeRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/auth/register': typeof ApiAuthRegisterRoute
+  '/api/auth/resend-verification': typeof ApiAuthResendVerificationRoute
+  '/api/auth/verify-email': typeof ApiAuthVerifyEmailRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -86,6 +101,8 @@ export interface FileRoutesByTo {
   '/items/$type': typeof ItemsTypeRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/auth/register': typeof ApiAuthRegisterRoute
+  '/api/auth/resend-verification': typeof ApiAuthResendVerificationRoute
+  '/api/auth/verify-email': typeof ApiAuthVerifyEmailRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -98,6 +115,8 @@ export interface FileRoutesById {
   '/items/$type': typeof ItemsTypeRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/auth/register': typeof ApiAuthRegisterRoute
+  '/api/auth/resend-verification': typeof ApiAuthResendVerificationRoute
+  '/api/auth/verify-email': typeof ApiAuthVerifyEmailRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -111,6 +130,8 @@ export interface FileRouteTypes {
     | '/items/$type'
     | '/api/auth/$'
     | '/api/auth/register'
+    | '/api/auth/resend-verification'
+    | '/api/auth/verify-email'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -122,6 +143,8 @@ export interface FileRouteTypes {
     | '/items/$type'
     | '/api/auth/$'
     | '/api/auth/register'
+    | '/api/auth/resend-verification'
+    | '/api/auth/verify-email'
   id:
     | '__root__'
     | '/'
@@ -133,6 +156,8 @@ export interface FileRouteTypes {
     | '/items/$type'
     | '/api/auth/$'
     | '/api/auth/register'
+    | '/api/auth/resend-verification'
+    | '/api/auth/verify-email'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -145,6 +170,8 @@ export interface RootRouteChildren {
   ItemsTypeRoute: typeof ItemsTypeRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiAuthRegisterRoute: typeof ApiAuthRegisterRoute
+  ApiAuthResendVerificationRoute: typeof ApiAuthResendVerificationRoute
+  ApiAuthVerifyEmailRoute: typeof ApiAuthVerifyEmailRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -212,6 +239,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthRegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/auth/resend-verification': {
+      id: '/api/auth/resend-verification'
+      path: '/api/auth/resend-verification'
+      fullPath: '/api/auth/resend-verification'
+      preLoaderRoute: typeof ApiAuthResendVerificationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/verify-email': {
+      id: '/api/auth/verify-email'
+      path: '/api/auth/verify-email'
+      fullPath: '/api/auth/verify-email'
+      preLoaderRoute: typeof ApiAuthVerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -225,6 +266,8 @@ const rootRouteChildren: RootRouteChildren = {
   ItemsTypeRoute: ItemsTypeRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiAuthRegisterRoute: ApiAuthRegisterRoute,
+  ApiAuthResendVerificationRoute: ApiAuthResendVerificationRoute,
+  ApiAuthVerifyEmailRoute: ApiAuthVerifyEmailRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

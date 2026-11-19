@@ -14,6 +14,23 @@ export const AUTH_ERROR_MESSAGES: Record<string, string> = {
 		"This email is already registered with a different sign-in method",
 };
 
+export const EMAIL_NOT_VERIFIED_CODE = "EmailNotVerified";
+
+export const VERIFY_MESSAGES: Record<string, string> = {
+	expired: "This verification link has expired. Request a new one below.",
+	invalid: "This verification link is invalid or was already used.",
+	error: "We couldn't verify your email. Please try again.",
+};
+
+export class SignInError extends Error {
+	code: string | null;
+
+	constructor(message: string, code: string | null) {
+		super(message);
+		this.code = code;
+	}
+}
+
 export const DEFAULT_AUTH_ERROR = "Something went wrong. Please try again.";
 
 async function getCsrfToken(): Promise<string> {
@@ -61,12 +78,20 @@ export async function signInWithCredentials(
 		}),
 	});
 	const data = (await response.json()) as CredentialsResponse;
-	const errorCode = data.url
-		? new URL(data.url, window.location.origin).searchParams.get("error")
+	const params = data.url
+		? new URL(data.url, window.location.origin).searchParams
 		: null;
+	const errorCode = params?.get("error") ?? null;
 	if (errorCode || !response.ok) {
-		throw new Error(
+		if (params?.get("code") === EMAIL_NOT_VERIFIED_CODE) {
+			throw new SignInError(
+				"Please verify your email before signing in",
+				EMAIL_NOT_VERIFIED_CODE,
+			);
+		}
+		throw new SignInError(
 			(errorCode && AUTH_ERROR_MESSAGES[errorCode]) || DEFAULT_AUTH_ERROR,
+			errorCode,
 		);
 	}
 	window.location.assign(callbackUrl);
@@ -80,4 +105,15 @@ export async function signInWithGitHub(callbackUrl: string): Promise<void> {
 export async function signOut(): Promise<void> {
 	const csrfToken = await getCsrfToken();
 	submitForm("/api/auth/signout", { csrfToken, callbackUrl: "/sign-in" });
+}
+
+export async function resendVerification(email: string): Promise<void> {
+	const response = await fetch("/api/auth/resend-verification", {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({ email }),
+	});
+	if (!response.ok) {
+		throw new Error(DEFAULT_AUTH_ERROR);
+	}
 }

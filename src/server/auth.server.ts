@@ -1,9 +1,14 @@
+import { CredentialsSignin } from "@auth/core/errors";
 import Credentials from "@auth/core/providers/credentials";
 import GitHub from "@auth/core/providers/github";
 import type { AuthConfig } from "@auth/core/types";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import bcrypt from "bcryptjs";
 import { prisma } from "#/db";
+
+class EmailNotVerifiedError extends CredentialsSignin {
+	code = "EmailNotVerified";
+}
 
 export const authConfig = {
 	basePath: "/api/auth",
@@ -35,6 +40,10 @@ export const authConfig = {
 				const isValid = await bcrypt.compare(password, user.password);
 				if (!isValid) {
 					return null;
+				}
+
+				if (!user.emailVerified) {
+					throw new EmailNotVerifiedError();
 				}
 
 				return {

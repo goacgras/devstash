@@ -1,11 +1,16 @@
 import { useMutation } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { type FormEvent, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "#/components/ui/button";
 import {
 	AUTH_ERROR_MESSAGES,
+	EMAIL_NOT_VERIFIED_CODE,
+	resendVerification,
+	SignInError,
 	signInWithCredentials,
 	signInWithGitHub,
+	VERIFY_MESSAGES,
 } from "#/lib/auth-client";
 import {
 	type FieldErrors,
@@ -17,18 +22,37 @@ import FormField from "./FormField";
 interface SignInFormProps {
 	redirectTo: string;
 	errorCode?: string;
+	verifyStatus?: string;
 }
 
-export default function SignInForm({ redirectTo, errorCode }: SignInFormProps) {
+export default function SignInForm({
+	redirectTo,
+	errorCode,
+	verifyStatus,
+}: SignInFormProps) {
 	const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
 	const credentialsMutation = useMutation({
 		mutationFn: (values: { email: string; password: string }) =>
 			signInWithCredentials(values.email, values.password, redirectTo),
 	});
+	const [email, setEmail] = useState("");
+	const resendMutation = useMutation({
+		mutationFn: () => resendVerification(email),
+		onSuccess: () =>
+			toast.success("Verification email sent. Check your inbox."),
+	});
 	const githubMutation = useMutation({
 		mutationFn: () => signInWithGitHub(redirectTo),
 	});
+
+	const verifySuccess = verifyStatus === "verified";
+	const verifyError =
+		verifyStatus && !verifySuccess ? VERIFY_MESSAGES[verifyStatus] : null;
+	const needsVerification =
+		credentialsMutation.error instanceof SignInError &&
+		credentialsMutation.error.code === EMAIL_NOT_VERIFIED_CODE;
+	const showResend = needsVerification || verifyStatus === "expired";
 
 	const urlError = errorCode
 		? (AUTH_ERROR_MESSAGES[errorCode] ?? "Sign in failed. Please try again.")
@@ -36,7 +60,8 @@ export default function SignInForm({ redirectTo, errorCode }: SignInFormProps) {
 	const formError =
 		credentialsMutation.error?.message ??
 		githubMutation.error?.message ??
-		urlError;
+		urlError ??
+		verifyError;
 	const isPending = credentialsMutation.isPending || githubMutation.isPending;
 
 	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -51,6 +76,7 @@ export default function SignInForm({ redirectTo, errorCode }: SignInFormProps) {
 			return;
 		}
 		setFieldErrors({});
+		setEmail(parsed.data.email);
 		credentialsMutation.mutate(parsed.data);
 	};
 
@@ -71,10 +97,28 @@ export default function SignInForm({ redirectTo, errorCode }: SignInFormProps) {
 					autoComplete="current-password"
 					error={fieldErrors.password}
 				/>
+				{verifySuccess ? (
+					<p role="status" className="text-sm text-emerald-500">
+						Email verified. You can sign in now.
+					</p>
+				) : null}
 				{formError ? (
 					<p role="alert" className="text-sm text-destructive">
 						{formError}
 					</p>
+				) : null}
+				{showResend ? (
+					<Button
+						type="button"
+						variant="outline"
+						className="w-full"
+						disabled={!email || resendMutation.isPending}
+						onClick={() => resendMutation.mutate()}
+					>
+						{resendMutation.isPending
+							? "Sending..."
+							: "Resend verification email"}
+					</Button>
 				) : null}
 				<Button type="submit" className="w-full" disabled={isPending}>
 					{credentialsMutation.isPending ? "Signing in..." : "Sign in"}

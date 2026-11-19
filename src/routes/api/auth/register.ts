@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import bcrypt from "bcryptjs";
 import { prisma } from "#/db";
 import { registerSchema } from "#/lib/validations/auth";
+import { sendVerification } from "#/server/verification.server";
 
 const BCRYPT_ROUNDS = 12;
 
@@ -61,7 +62,15 @@ export const Route = createFileRoute("/api/auth/register")({
 						select: { id: true, name: true, email: true },
 					});
 
-					return jsonResponse({ success: true, data: user }, 201);
+					let emailSent = true;
+					try {
+						await sendVerification(email, new URL(request.url).origin);
+					} catch (error) {
+						emailSent = false;
+						console.error("Sending verification email failed", error);
+					}
+
+					return jsonResponse({ success: true, data: user, emailSent }, 201);
 				} catch (error) {
 					if (isUniqueConstraintError(error)) {
 						return jsonResponse(

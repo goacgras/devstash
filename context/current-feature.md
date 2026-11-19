@@ -1,16 +1,28 @@
-# Current Feature
+# Current Feature: Email Verification on Register
 
 ## Status
 
-<!-- Not Started | In Progress | Completed -->
+In Progress
 
 ## Goals
 
-<!-- Goals and requirements -->
+- New email/password users must verify their email by clicking a link sent to their inbox before they can sign in
+- On registration, create a verification token (Auth.js `VerificationToken` model), store it with an expiry, and email a verification link via Resend
+- Add a verify route/endpoint that validates the token, sets `User.emailVerified`, deletes the token, and redirects to `/sign-in` with a success message
+- Block credentials sign-in for unverified users with a clear error on `/sign-in`
+- Handle expired or invalid tokens with a friendly message and a way to resend the verification email
+- After registering, show a "check your email" state instead of signing the user in
+- GitHub OAuth users are unaffected (treated as verified)
 
 ## Notes
 
-<!-- Any extra notes -->
+- Email provider: Resend; `RESEND_API_KEY` is in `.env.local`
+- Add the `resend` package; keep the Resend client and email sending in a `*.server.ts` file (e.g. `src/server/email.server.ts`)
+- Uses the existing `VerificationToken` model; no schema change expected. If one is needed, use `prisma migrate dev`, never `db push`
+- Touches `POST /api/auth/register` (`src/routes/api/auth/register.ts`), the Credentials `authorize` in `src/server/auth.server.ts`, and the `/sign-in` and `/register` pages
+- Validate inputs with Zod (shared schemas in `src/lib/validations/auth.ts`)
+- Open items to confirm at start: sender address/domain (Resend's `onboarding@resend.dev` works only for the account owner's email until a domain is verified), token expiry (suggest 24h), and the app base URL env var for building links
+- Existing users (e.g. demo user) have no `emailVerified`; they need to be backfilled or exempted so sign-in keeps working
 
 ## History
 
