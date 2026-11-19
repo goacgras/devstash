@@ -1,28 +1,16 @@
-# Current Feature: Email Verification on Register
+# Current Feature
 
 ## Status
 
-In Progress
+<!-- Not Started | In Progress | Completed -->
 
 ## Goals
 
-- New email/password users must verify their email by clicking a link sent to their inbox before they can sign in
-- On registration, create a verification token (Auth.js `VerificationToken` model), store it with an expiry, and email a verification link via Resend
-- Add a verify route/endpoint that validates the token, sets `User.emailVerified`, deletes the token, and redirects to `/sign-in` with a success message
-- Block credentials sign-in for unverified users with a clear error on `/sign-in`
-- Handle expired or invalid tokens with a friendly message and a way to resend the verification email
-- After registering, show a "check your email" state instead of signing the user in
-- GitHub OAuth users are unaffected (treated as verified)
+<!-- Goals and requirements -->
 
 ## Notes
 
-- Email provider: Resend; `RESEND_API_KEY` is in `.env.local`
-- Add the `resend` package; keep the Resend client and email sending in a `*.server.ts` file (e.g. `src/server/email.server.ts`)
-- Uses the existing `VerificationToken` model; no schema change expected. If one is needed, use `prisma migrate dev`, never `db push`
-- Touches `POST /api/auth/register` (`src/routes/api/auth/register.ts`), the Credentials `authorize` in `src/server/auth.server.ts`, and the `/sign-in` and `/register` pages
-- Validate inputs with Zod (shared schemas in `src/lib/validations/auth.ts`)
-- Open items to confirm at start: sender address/domain (Resend's `onboarding@resend.dev` works only for the account owner's email until a domain is verified), token expiry (suggest 24h), and the app base URL env var for building links
-- Existing users (e.g. demo user) have no `emailVerified`; they need to be backfilled or exempted so sign-in keeps working
+<!-- Any extra notes -->
 
 ## History
 
@@ -43,3 +31,4 @@ In Progress
 - Completed Auth Phase 1 (Auth.js + GitHub) on branch `feature/auth-phase-1` (merged to `main`): Auth.js with `@auth/core` and `@auth/prisma-adapter` (not `next-auth`), GitHub OAuth provider, JWT sessions, Auth.js handler mounted as a TanStack server route at `/api/auth/*` (`src/routes/api/auth/$.ts`), `getCurrentUser` server function in `src/server/auth.functions.ts`, `/dashboard` `beforeLoad` guard redirecting to `/api/auth/signin`, and session/user types augmented with `id` in `src/types/auth.d.ts`. Verified: `tsc --noEmit` clean, build passes, `/dashboard` redirects to sign-in, `/api/auth/providers` lists GitHub with the expected callback URL, `/api/auth/session` returns `null` when signed out. Not verified in a browser: full GitHub sign-in returning to `/dashboard`, and `getCurrentUser` with a real session.
 - Completed Auth Phase 2 (Credentials Provider) on branch `feature/auth-phase-2` (merged to `main`): Credentials (email/password) provider in `src/server/auth.server.ts` with a bcrypt `authorize`, alongside GitHub on JWT sessions. `POST /api/auth/register` in `src/routes/api/auth/register.ts` validates with Zod (new dependency), hashes with bcryptjs (12 rounds), and returns 201, 400, 409, or 500 without the password hash. Verified with curl against the dev server: registration status codes, Credentials sign-in (wrong password rejected, correct password lands on `/dashboard`), and `/api/auth/session` returns the user with `id`. Build passes. Not checked in a browser: sign-in form and GitHub sign-in after this change. Known edge case left out of scope: email/password account signing in with GitHub using the same email hits `OAuthAccountNotLinked`.
 - Completed Auth Phase 3 (Custom Sign In, Register & Sign Out UI) on branch `feature/auth-phase-3` (merged to `main`): custom `/sign-in` and `/register` pages (Zod validation shared via `src/lib/validations/auth.ts`, same-origin `redirect` param, signed-in users redirected to `/dashboard`), protected placeholder `/profile`, `pages.signIn` set in Auth.js, `/dashboard` guard now uses `requireUser` (`src/lib/auth-guard.ts`) and redirects to `/sign-in`. Browser helpers in `src/lib/auth-client.ts` call the Auth.js endpoints directly (CSRF token, credentials sign-in via the `X-Auth-Return-Redirect: 1` header, form posts for GitHub and sign out). Sidebar user area shows the real session user via a reusable `UserAvatar` (GitHub image or initials) with an upward dropdown for sign out; `mock-data.ts` removed. Added shadcn `dropdown-menu`, `label` and `sonner` (success toast after registration, dark theme only, no `next-themes`). Dashboard layout is now one screen tall so only the main content scrolls and the sidebar stays fixed. Verified: `tsc --noEmit` clean, build passes, `/sign-in` and `/register` render, `/dashboard` and `/profile` redirect to `/sign-in` when signed out, failed credentials login returns the `CredentialsSignin` error URL. Not checked in a browser: GitHub sign-in, successful credentials sign-in, sign out, registration toast, and the sidebar scroll behavior.
+- Completed Email Verification on Register on branch `feature/email-verification` (merged to `main`): registration creates a SHA-256-hashed `VerificationToken` (24h expiry) and emails a link via Resend (`src/server/email.server.ts`, `src/server/verification.server.ts`; sender from `EMAIL_FROM`, default `onboarding@resend.dev`; link origin taken from the request). `GET /api/auth/verify-email` sets `emailVerified`, consumes the token, and redirects to `/sign-in?verify=…`; `POST /api/auth/resend-verification` gives the same response whether or not the account exists. Credentials `authorize` throws `EmailNotVerified` for unverified users; the sign-in form shows the verify result and a resend button, and the register form shows a check-your-email state (account is still created if the send fails). Added `resend` and `scripts/delete-users.ts` (`npm run db:delete-users`, dry run unless `--yes`; deletes all users except `demo@devstash.io`). Verified with curl: registration, unverified sign-in blocked, invalid/valid/reused token, sign-in after verifying; `tsc` clean, build passes. Not verified: actual email delivery (Resend send failed in dev; needs a verified domain or the account owner's address), and the UI in a browser. Existing credentials users other than the demo user must verify or be backfilled.
