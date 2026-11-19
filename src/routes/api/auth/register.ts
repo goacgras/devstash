@@ -1,23 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import bcrypt from "bcryptjs";
-import { z } from "zod";
 import { prisma } from "#/db";
+import { registerSchema } from "#/lib/validations/auth";
 
 const BCRYPT_ROUNDS = 12;
-
-const registerSchema = z
-	.object({
-		name: z.string().trim().min(1, "Name is required"),
-		email: z
-			.email("Invalid email address")
-			.transform((value) => value.toLowerCase()),
-		password: z.string().min(8, "Password must be at least 8 characters"),
-		confirmPassword: z.string(),
-	})
-	.refine((data) => data.password === data.confirmPassword, {
-		message: "Passwords do not match",
-		path: ["confirmPassword"],
-	});
 
 function jsonResponse(body: unknown, status: number): Response {
 	return Response.json(body, { status });
